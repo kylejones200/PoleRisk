@@ -6,7 +6,7 @@ This document explains how to set up automatic publishing to PyPI and ReadTheDoc
 
 ### 1. **Publish to PyPI** (Production)
 - **Trigger**: When you push a git tag starting with `v` (e.g., `v1.0.0`)
-- **File**: `.github/workflows/publish-pypi.yml`
+- **File**: `.github/workflows/publish.yml`
 - **What it does**: Automatically builds and publishes to PyPI using Trusted Publishing
 
 ### 2. **ReadTheDocs**
@@ -31,7 +31,7 @@ Trusted Publishing is PyPI's secure, token-free publishing method.
      - **PyPI Project Name**: `polerisk`
      - **Owner**: `kylejones200`
      - **Repository name**: `PoleRisk`
-     - **Workflow name**: `publish-pypi.yml`
+     - **Workflow name**: `publish.yml`
      - **Environment name**: `pypi`
    - Click "Add"
 
@@ -152,7 +152,7 @@ After setup, verify everything works:
 - Verify you added the trusted publisher on PyPI
 - Check all fields match exactly:
   - Repository: `kylejones200/PoleRisk`
-  - Workflow: `publish-pypi.yml`
+  - Workflow: `publish.yml`
   - Environment: `pypi`
 
 **Error: Project name already taken**
