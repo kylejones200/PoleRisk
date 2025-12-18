@@ -1,65 +1,51 @@
 # Automated PyPI and ReadTheDocs Setup
 
-This document explains how to set up automatic publishing to PyPI and ReadTheDocs.
+This document explains how to set up automatic publishing to PyPI and ReadTheDocs using **Trusted Publishing** (no API tokens required!).
 
 ## 🤖 Automated Workflows
 
-Your repository now has two GitHub Actions workflows:
-
 ### 1. **Publish to PyPI** (Production)
-- **Trigger**: When you create a GitHub Release
+- **Trigger**: When you push a git tag starting with `v` (e.g., `v1.0.0`)
 - **File**: `.github/workflows/publish-pypi.yml`
-- **What it does**: Automatically builds and publishes to PyPI
+- **What it does**: Automatically builds and publishes to PyPI using Trusted Publishing
 
-### 2. **Publish to TestPyPI** (Testing)
-- **Trigger**: When you push to `develop` or `staging` branches
-- **File**: `.github/workflows/publish-test-pypi.yml`
-- **What it does**: Automatically builds and publishes to TestPyPI for testing
+### 2. **ReadTheDocs**
+- **Trigger**: Automatic on every push to `main`
+- **File**: `.readthedocs.yaml`
+- **What it does**: Automatically builds documentation
 
 ## 📋 Setup Instructions
 
-### Step 1: Get PyPI API Tokens
+### Step 1: Set Up PyPI Trusted Publishing (Recommended - No Tokens!)
 
-#### For Production PyPI:
-1. Go to [pypi.org](https://pypi.org) and log in
-2. Go to Account Settings → API tokens
-3. Click "Add API token"
-4. Name it: `GitHub Actions - polerisk`
-5. Scope: Select "Entire account" (or specific to `polerisk` after first upload)
-6. Copy the token (starts with `pypi-`)
+Trusted Publishing is PyPI's secure, token-free publishing method.
 
-#### For TestPyPI (Optional but Recommended):
-1. Go to [test.pypi.org](https://test.pypi.org) and log in
-2. Go to Account Settings → API tokens
-3. Click "Add API token"
-4. Name it: `GitHub Actions - polerisk-test`
-5. Scope: "Entire account"
-6. Copy the token (starts with `pypi-`)
+1. **Go to PyPI**:
+   - Visit https://pypi.org and log in
+   - Go to "Your projects" (you'll create the project after first upload)
 
-### Step 2: Add Secrets to GitHub
+2. **Add GitHub as Trusted Publisher** (do this BEFORE first upload):
+   - Go to https://pypi.org/manage/account/publishing/
+   - Click "Add a new pending publisher"
+   - Fill in:
+     - **PyPI Project Name**: `polerisk`
+     - **Owner**: `kylejones200`
+     - **Repository name**: `PoleRisk`
+     - **Workflow name**: `publish-pypi.yml`
+     - **Environment name**: `pypi`
+   - Click "Add"
 
-1. Go to your GitHub repository: https://github.com/kylejones200/polerisk
-2. Click **Settings** → **Secrets and variables** → **Actions**
-3. Click **New repository secret**
-4. Add these secrets:
+3. **That's it!** No API tokens needed.
 
-   **Secret 1:**
-   - Name: `PYPI_API_TOKEN`
-   - Value: Your PyPI token (from Step 1)
-   
-   **Secret 2 (Optional):**
-   - Name: `TEST_PYPI_API_TOKEN`
-   - Value: Your TestPyPI token (from Step 1)
-
-### Step 3: Set Up ReadTheDocs
+### Step 2: Set Up ReadTheDocs
 
 1. Go to [readthedocs.org](https://readthedocs.org) and sign in with GitHub
 2. Click **Import a Project**
-3. Select `kylejones200/polerisk` from your repositories
+3. Select `kylejones200/PoleRisk` from your repositories
 4. Click **Next**
 5. Configure:
    - Name: `polerisk`
-   - Repository URL: `https://github.com/kylejones200/polerisk`
+   - Repository URL: `https://github.com/kylejones200/PoleRisk`
    - Default branch: `main`
 6. Click **Finish**
 
@@ -70,93 +56,78 @@ ReadTheDocs will automatically:
 
 ## 🚀 How to Use
 
-### Publishing to PyPI (Production)
+### Publishing a New Version to PyPI:
 
-1. **Update version** in `pyproject.toml` and `polerisk/__init__.py`:
-   ```toml
-   version = "1.0.1"  # Increment version
-   ```
+```bash
+# 1. Update version in pyproject.toml and polerisk/__init__.py
+# Example: version = "1.0.1"
 
-2. **Commit and push** changes:
-   ```bash
-   git add pyproject.toml polerisk/__init__.py
-   git commit -m "Bump version to 1.0.1"
-   git push origin main
-   ```
+# 2. Commit changes
+git add pyproject.toml polerisk/__init__.py
+git commit -m "Bump version to 1.0.1"
+git push origin main
 
-3. **Create a GitHub Release**:
-   - Go to https://github.com/kylejones200/polerisk/releases
-   - Click **Draft a new release**
-   - Tag version: `v1.0.1` (must start with 'v')
-   - Release title: `Release 1.0.1`
-   - Description: List changes/improvements
-   - Click **Publish release**
+# 3. Create and push a tag
+git tag v1.0.1
+git push origin v1.0.1
 
-4. **Automatic publishing**:
-   - GitHub Actions will automatically build and publish to PyPI
-   - Check progress in the **Actions** tab
-   - Package will be live at `https://pypi.org/project/polerisk/`
-
-### Testing with TestPyPI
-
-1. **Create a `develop` branch**:
-   ```bash
-   git checkout -b develop
-   ```
-
-2. **Make changes and push**:
-   ```bash
-   git add .
-   git commit -m "Test changes"
-   git push origin develop
-   ```
-
-3. **Automatic publishing**:
-   - GitHub Actions will automatically publish to TestPyPI
-   - Test installation:
-     ```bash
-     pip install --index-url https://test.pypi.org/simple/ polerisk
-     ```
-
-### Manual Publishing (If Needed)
-
-You can also manually trigger the workflows:
-
-1. Go to **Actions** tab in GitHub
-2. Select the workflow (Publish to PyPI or TestPyPI)
-3. Click **Run workflow**
-4. Select the branch
-5. Click **Run workflow**
-
-## 📚 ReadTheDocs Automatic Updates
-
-ReadTheDocs automatically rebuilds documentation when:
-- You push to the `main` branch
-- You create a pull request (preview build)
-- You create a new tag/release
-
-**View your docs at**: https://polerisk.readthedocs.io/
-
-To manually rebuild:
-1. Go to https://readthedocs.org/projects/polerisk/
-2. Click **Builds**
-3. Click **Build Version**
-
-## 🔄 Workflow Summary
-
-### Development Workflow:
-```
-1. Make changes → 2. Push to develop → 3. Auto-publish to TestPyPI → 4. Test
+# 4. GitHub Actions automatically publishes to PyPI! ✨
 ```
 
-### Release Workflow:
-```
-1. Update version → 2. Commit & push → 3. Create GitHub Release → 4. Auto-publish to PyPI
+**That's it!** The workflow will:
+- Build the package
+- Publish to PyPI using Trusted Publishing
+- No tokens or secrets needed
+
+### Creating a GitHub Release (Optional):
+
+After pushing the tag, you can also create a GitHub release for better visibility:
+
+1. Go to https://github.com/kylejones200/PoleRisk/releases/new
+2. Select your tag: `v1.0.1`
+3. Release title: `Release 1.0.1`
+4. Add release notes describing changes
+5. Click **Publish release**
+
+### Documentation Updates:
+
+Documentation automatically updates when you push to `main`:
+
+```bash
+# Just push to main - ReadTheDocs auto-rebuilds!
+git push origin main
 ```
 
-### Documentation Workflow:
-```
-1. Update docs → 2. Push to main → 3. ReadTheDocs auto-builds → 4. Live at readthedocs.io
+## 🔄 Complete Workflow Example
+
+Here's a complete release workflow:
+
+```bash
+# 1. Make your changes
+git checkout -b feature/new-feature
+# ... make changes ...
+git commit -m "Add new feature"
+git push origin feature/new-feature
+
+# 2. Create PR and merge to main
+# (via GitHub UI)
+
+# 3. Update version for release
+git checkout main
+git pull origin main
+
+# Edit pyproject.toml: version = "1.0.1"
+# Edit polerisk/__init__.py: __version__ = "1.0.1"
+
+git add pyproject.toml polerisk/__init__.py
+git commit -m "Bump version to 1.0.1"
+git push origin main
+
+# 4. Tag and release
+git tag v1.0.1
+git push origin v1.0.1
+
+# ✨ Automatic deployment starts!
 ```
 
 ## ✅ Verification
@@ -164,16 +135,11 @@ To manually rebuild:
 After setup, verify everything works:
 
 1. **Test PyPI Publishing**:
-   - Push to `develop` branch
-   - Check Actions tab for successful build
-   - Verify package on TestPyPI
-
-2. **Test PyPI Production**:
-   - Create a test release (v1.0.0)
-   - Check Actions tab for successful build
+   - Create a test tag: `git tag v1.0.0 && git push origin v1.0.0`
+   - Check GitHub Actions: https://github.com/kylejones200/PoleRisk/actions
    - Verify package on PyPI: https://pypi.org/project/polerisk/
 
-3. **Test ReadTheDocs**:
+2. **Test ReadTheDocs**:
    - Push a doc change to `main`
    - Check ReadTheDocs builds: https://readthedocs.org/projects/polerisk/builds/
    - Verify docs are live: https://polerisk.readthedocs.io/
@@ -182,23 +148,25 @@ After setup, verify everything works:
 
 ### PyPI Publishing Fails
 
-**Error: Invalid token**
-- Verify the token is correct in GitHub Secrets
-- Ensure token hasn't expired
-- Check token scope includes the package
+**Error: Trusted publishing exchange failure**
+- Verify you added the trusted publisher on PyPI
+- Check all fields match exactly:
+  - Repository: `kylejones200/PoleRisk`
+  - Workflow: `publish-pypi.yml`
+  - Environment: `pypi`
 
-**Error: File already exists**
-- You're trying to upload a version that already exists
-- Increment the version number in `pyproject.toml`
-
-**Error: Package name taken**
+**Error: Project name already taken**
 - The package name `polerisk` might be taken
 - Try a different name in `pyproject.toml`
+
+**Error: Version already exists**
+- You're trying to upload a version that already exists
+- Increment the version number in `pyproject.toml`
 
 ### ReadTheDocs Build Fails
 
 **Error: Python version**
-- Check `.readthedocs.yaml` has Python 3.12
+- Check `.readthedocs.yaml` has Python 3.13
 - Verify requirements-docs.txt has all dependencies
 
 **Error: Sphinx configuration**
@@ -209,19 +177,27 @@ After setup, verify everything works:
 - Add missing dependencies to `requirements-docs.txt`
 - Ensure package installs correctly
 
+## 🔐 Security Benefits of Trusted Publishing
+
+Trusted Publishing is more secure than API tokens because:
+- ✅ No long-lived credentials to manage
+- ✅ No secrets stored in GitHub
+- ✅ Uses OpenID Connect (OIDC) for authentication
+- ✅ Scoped to specific repository and workflow
+- ✅ PyPI's recommended method
+
 ## 📞 Support
 
 - **GitHub Actions**: Check the Actions tab for build logs
-- **PyPI Issues**: https://pypi.org/help/
-- **ReadTheDocs Issues**: https://docs.readthedocs.io/
+- **PyPI Trusted Publishing**: https://docs.pypi.org/trusted-publishers/
+- **ReadTheDocs**: https://docs.readthedocs.io/
 
 ## 🎉 You're All Set!
 
-Once configured, your workflow is:
+Your workflow is now:
 
-1. **Develop** → Push to `develop` → Auto-test on TestPyPI
-2. **Release** → Create GitHub Release → Auto-publish to PyPI
-3. **Document** → Push to `main` → Auto-update ReadTheDocs
+1. **Develop** → Make changes and merge to main
+2. **Release** → Push a version tag (v1.0.0) → Auto-publish to PyPI
+3. **Document** → Push to main → Auto-update ReadTheDocs
 
-No manual building or uploading needed! 🚀
-
+No manual building, uploading, or token management needed! 🚀
