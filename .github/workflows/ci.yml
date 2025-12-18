@@ -178,34 +178,35 @@ jobs:
         docker tag soil-moisture-analyzer:test ${{ secrets.DOCKER_USERNAME }}/soil-moisture-analyzer:latest
         docker push ${{ secrets.DOCKER_USERNAME }}/soil-moisture-analyzer:latest
 
-  deploy-docs:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install -r requirements-docs.txt
-    
-    - name: Build documentation
-      run: |
-        cd docs
-        make html
-    
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_build/html
+  # deploy-docs:
+  #   # Disabled: Using ReadTheDocs for documentation instead of GitHub Pages
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version: '3.12'
+  #   
+  #   - name: Install dependencies
+  #     run: |
+  #       pip install -r requirements.txt
+  #       pip install -r requirements-docs.txt
+  #   
+  #   - name: Build documentation
+  #     run: |
+  #       cd docs
+  #       make html
+  #   
+  #   - name: Deploy to GitHub Pages
+  #     uses: peaceiris/actions-gh-pages@v3
+  #     with:
+  #       github_token: ${{ secrets.GITHUB_TOKEN }}
+  #       publish_dir: ./docs/_build/html
 
   release:
     runs-on: ubuntu-latest
