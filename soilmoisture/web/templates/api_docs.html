@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}API Documentation - Soil Moisture Analyzer{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-book"></i> API Documentation</h2>
+        <p class="text-muted">REST API endpoints for programmatic access</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Upload Endpoints -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-upload"></i> Data Upload</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <span class="badge bg-success">POST</span>
+                    <code class="ms-2">/api/upload</code>
+                </div>
+                <p>Upload a data file for analysis.</p>
+                <h6>Request</h6>
+                <pre class="bg-light p-3"><code>Content-Type: multipart/form-data
+
+file: [binary data]</code></pre>
+                
+                <h6>Response</h6>
+                <pre class="bg-light p-3"><code>{
+  "message": "File uploaded successfully",
+  "filename": "data.csv",
+  "stats": {
+    "n_rows": 365,
+    "columns": ["date", "in_situ", "satellite"],
+    "date_range": {
+      "start": "2023-01-01",
+      "end": "2023-12-31"
+    }
+  }
+}</code></pre>
+            </div>
+        </div>
+        
+        <!-- ML Endpoints -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-brain"></i> Machine Learning</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <span class="badge bg-primary">POST</span>
+                        <code class="ms-2">/api/train-model</code>
+                    </div>
+                    <p>Train a machine learning model.</p>
+                    <h6>Request</h6>
+                    <pre class="bg-light p-3"><code>{
+  "filename": "data.csv",
+  "model_type": "random_forest",
+  "max_features": 25,
+  "correlation_threshold": 0.05
+}</code></pre>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <span class="badge bg-primary">POST</span>
+                        <code class="ms-2">/api/predict</code>
+                    </div>
+                    <p>Make predictions using a trained model.</p>
+                    <h6>Request</h6>
+                    <pre class="bg-light p-3"><code>{
+  "filename": "data.csv",
+  "model_filename": "model_random_forest_20240101_120000.joblib"
+}</code></pre>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <span class="badge bg-warning">POST</span>
+                        <code class="ms-2">/api/detect-anomalies</code>
+                    </div>
+                    <p>Detect anomalies in soil moisture data.</p>
+                    <h6>Request</h6>
+                    <pre class="bg-light p-3"><code>{
+  "filename": "data.csv",
+  "method": "isolation_forest"
+}</code></pre>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <span class="badge bg-info">POST</span>
+                        <code class="ms-2">/api/forecast</code>
+                    </div>
+                    <p>Generate soil moisture forecasts.</p>
+                    <h6>Request</h6>
+                    <pre class="bg-light p-3"><code>{
+  "filename": "data.csv",
+  "forecast_days": 7,
+  "model_type": "linear"
+}</code></pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Endpoints -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-database"></i> Data Access</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <span class="badge bg-secondary">GET</span>
+                        <code class="ms-2">/api/data/{filename}</code>
+                    </div>
+                    <p>Get information about a data file.</p>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <span class="badge bg-secondary">GET</span>
+                        <code class="ms-2">/api/visualize/{filename}</code>
+                    </div>
+                    <p>Generate visualization dashboard for a data file.</p>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <span class="badge bg-secondary">GET</span>
+                        <code class="ms-2">/api/models</code>
+                    </div>
+                    <p>List available trained models.</p>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="mb-3">
+                        <span class="badge bg-secondary">GET</span>
+                        <code class="ms-2">/api/status</code>
+                    </div>
+                    <p>Get system status and capabilities.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Quick Reference -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Quick Reference</h5>
+            </div>
+            <div class="card-body">
+                <h6>Base URL</h6>
+                <code>http://localhost:5000/api</code>
+                
+                <h6 class="mt-3">Authentication</h6>
+                <p class="small">No authentication required for this version.</p>
+                
+                <h6>Content Type</h6>
+                <p class="small">All endpoints accept and return JSON, except file uploads which use multipart/form-data.</p>
+                
+                <h6>Error Responses</h6>
+                <pre class="small bg-light p-2"><code>{
+  "error": "Error message"
+}</code></pre>
+                
+                <h6>Status Codes</h6>
+                <ul class="small">
+                    <li><span class="badge bg-success">200</span> Success</li>
+                    <li><span class="badge bg-warning">400</span> Bad Request</li>
+                    <li><span class="badge bg-danger">404</span> Not Found</li>
+                    <li><span class="badge bg-danger">500</span> Server Error</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-code"></i> Example Code</h5>
+            </div>
+            <div class="card-body">
+                <h6>Python</h6>
+                <pre class="small bg-light p-2"><code>import requests
+
+# Upload file
+with open('data.csv', 'rb') as f:
+    response = requests.post(
+        'http://localhost:5000/api/upload',
+        files={'file': f}
+    )
+
+# Train model
+response = requests.post(
+    'http://localhost:5000/api/train-model',
+    json={
+        'filename': 'data.csv',
+        'model_type': 'random_forest'
+    }
+)</code></pre>
+                
+                <h6 class="mt-3">JavaScript</h6>
+                <pre class="small bg-light p-2"><code>// Upload file
+const formData = new FormData();
+formData.append('file', file);
+
+fetch('/api/upload', {
+    method: 'POST',
+    body: formData
+})
+.then(response => response.json())
+.then(data => console.log(data));</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

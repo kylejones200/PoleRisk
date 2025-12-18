@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Soil Moisture Analyzer"
+version: 0.1.0
+date-released: 2025-08-06
+doi:   # Update this with your actual DOI when available
+authors:
+  - family-names: "Jones"
+    given-names: "Kyle"
+    email: "KyleTJones@gmail.com"
+    orcid: "https://orcid.org/0000-0000-0000-0000"  # Update with your ORCID if available
+    affiliation: "American University"
+repository-code: "https://github.com/yourusername/soil-moisture-analyzer"
+license: "MIT"
+abstract: "A Python package for processing and analyzing AMSR2 LPRM soil moisture data and matching it with in-situ measurements."

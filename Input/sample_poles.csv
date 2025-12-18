@@ -1,0 +1,4 @@
+pole_id,latitude,longitude,pole_type,material,height_ft,install_date,voltage_class,structure_type,treatment_type
+P001,40.7128,-74.006,wood,Southern Pine,45,2010-05-15,distribution,tangent,CCA
+P002,40.758,-73.9855,concrete,Prestressed Concrete,50,2005-08-22,transmission,dead-end,
+P003,40.6782,-73.9442,steel,Galvanized Steel,55,2015-03-10,transmission,corner,

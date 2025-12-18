@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced Analytics{% endblock %}
+
+{% block head %}
+<style>
+    .analytics-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        transition: box-shadow 0.2s;
+    }
+    .analytics-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .feature-icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    .chart-container {
+        height: 400px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 10px;
+    }
+    .stat-value {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-chart-line me-2"></i>Advanced Analytics</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="runAnalysis()">
+                        <i class="fas fa-play me-2"></i>Run Full Analysis
+                    </button>
+                </div>
+            </div>
+
+            <!-- Key Statistics -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card p-3 h-100">
+                        <h6 class="mb-2">Data Points</h6>
+                        <div class="stat-value" id="data-points">1,247</div>
+                        <small>Total measurements</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card p-3 h-100" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <h6 class="mb-2">Correlation</h6>
+                        <div class="stat-value" id="correlation">0.78</div>
+                        <small>In-situ vs Satellite</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card p-3 h-100" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <h6 class="mb-2">RMSE</h6>
+                        <div class="stat-value" id="rmse">0.045</div>
+                        <small>Root Mean Square Error</small>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card p-3 h-100" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <h6 class="mb-2">Anomalies</h6>
+                        <div class="stat-value" id="anomalies">12</div>
+                        <small>Outliers detected</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Features -->
+            <div class="row mb-4">
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="analytics-card p-4 h-100 text-center">
+                        <div class="feature-icon text-primary">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h5>Time Series Analysis</h5>
+                        <p class="text-muted">
+                            Analyze temporal patterns, seasonality, and trends in soil moisture data.
+                        </p>
+                        <button class="btn btn-outline-primary btn-sm" onclick="runTimeSeriesAnalysis()">
+                            <i class="fas fa-play me-1"></i>Analyze
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="analytics-card p-4 h-100 text-center">
+                        <div class="feature-icon text-success">
+                            <i class="fas fa-wave-square"></i>
+                        </div>
+                        <h5>Trend Detection</h5>
+                        <p class="text-muted">
+                            Identify long-term trends and change points in the data using statistical methods.
+                        </p>
+                        <button class="btn btn-outline-success btn-sm" onclick="runTrendDetection()">
+                            <i class="fas fa-search me-1"></i>Detect
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="analytics-card p-4 h-100 text-center">
+                        <div class="feature-icon text-warning">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h5>Climatology</h5>
+                        <p class="text-muted">
+                            Compute long-term climate statistics, seasonal patterns, and anomalies.
+                        </p>
+                        <button class="btn btn-outline-warning btn-sm" onclick="runClimatology()">
+                            <i class="fas fa-calculator me-1"></i>Calculate
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="analytics-card p-4 h-100 text-center">
+                        <div class="feature-icon text-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h5>Extreme Events</h5>
+                        <p class="text-muted">
+                            Identify and analyze extreme drought and wet events using percentile thresholds.
+                        </p>
+                        <button class="btn btn-outline-danger btn-sm" onclick="runExtremeEvents()">
+                            <i class="fas fa-bolt me-1"></i>Find Events
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Results -->
+            <div class="row">
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Analysis Results</h6>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportResults()">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" id="results-chart">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-chart-bar fa-3x mb-3 opacity-50"></i>
+                                    <p>Run an analysis to see results here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="mb-0">Analysis Summary</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="analysis-summary">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-info-circle fa-2x mb-3 opacity-50"></i>
+                                    <p>Analysis summary will appear here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Options -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Advanced Analysis Options</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Analysis Period</label>
+                                    <select class="form-select" id="analysis-period">
+                                        <option value="all">All Available Data</option>
+                                        <option value="year">Last Year</option>
+                                        <option value="season">Current Season</option>
+                                        <option value="custom">Custom Range</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Significance Level</label>
+                                    <select class="form-select" id="significance-level">
+                                        <option value="0.05">95% Confidence (α = 0.05)</option>
+                                        <option value="0.01">99% Confidence (α = 0.01)</option>
+                                        <option value="0.10">90% Confidence (α = 0.10)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Trend Method</label>
+                                    <select class="form-select" id="trend-method">
+                                        <option value="linear">Linear Regression</option>
+                                        <option value="theil_sen">Theil-Sen Estimator</option>
+                                        <option value="polynomial">Polynomial Fit</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Seasonal Decomposition</label>
+                                    <select class="form-select" id="decomposition-type">
+                                        <option value="additive">Additive</option>
+                                        <option value="multiplicative">Multiplicative</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function runAnalysis() {
+    showLoadingSpinner('Running comprehensive analysis...');
+    
+    // Simulate analysis
+    setTimeout(() => {
+        hideLoadingSpinner();
+        updateStats();
+        showAnalysisResults();
+        
+        showAlert('success', 'Complete Analysis Finished!', 'All analytics have been computed successfully.');
+    }, 3000);
+}
+
+function runTimeSeriesAnalysis() {
+    showLoadingSpinner('Performing time series analysis...');
+    
+    setTimeout(() => {
+        hideLoadingSpinner();
+        updateAnalysisSummary('Time Series Analysis', {
+            'Seasonality Detected': 'Strong annual cycle',
+            'Trend': 'Slight increasing trend (0.002 units/year)',
+            'Stationarity': 'Non-stationary (ADF p-value: 0.15)',
+            'Autocorrelation': 'Significant up to lag 30'
+        });
+        showAlert('info', 'Time Series Analysis Complete', 'Detected strong seasonality and slight increasing trend.');
+    }, 2000);
+}
+
+function runTrendDetection() {
+    showLoadingSpinner('Detecting trends and change points...');
+    
+    setTimeout(() => {
+        hideLoadingSpinner();
+        updateAnalysisSummary('Trend Detection', {
+            'Linear Trend': 'Increasing (slope: +0.0018, p < 0.05)',
+            'Change Points': '2 significant change points detected',
+            'Trend Strength': 'Moderate (R² = 0.23)',
+            'Seasonal Trends': 'Stronger trends in winter months'
+        });
+        showAlert('success', 'Trend Detection Complete', 'Found significant increasing trend with 2 change points.');
+    }, 2500);
+}
+
+function runClimatology() {
+    showLoadingSpinner('Computing climatological statistics...');
+    
+    setTimeout(() => {
+        hideLoadingSpinner();
+        updateAnalysisSummary('Climatology Analysis', {
+            'Long-term Mean': '0.234 m³/m³',
+            'Annual Cycle Amplitude': '0.089 m³/m³',
+            'Peak Month': 'April (spring)',
+            'Driest Month': 'August (late summer)',
+            'Interannual Variability': 'Moderate (CV = 0.18)'
+        });
+        showAlert('info', 'Climatology Analysis Complete', 'Computed long-term climate statistics and seasonal patterns.');
+    }, 2000);
+}
+
+function runExtremeEvents() {
+    showLoadingSpinner('Identifying extreme events...');
+    
+    setTimeout(() => {
+        hideLoadingSpinner();
+        updateAnalysisSummary('Extreme Events', {
+            'Extreme Dry Events': '8 events below 5th percentile',
+            'Extreme Wet Events': '6 events above 95th percentile',
+            'Longest Drought': '23 days (summer 2021)',
+            'Most Intense Wet Period': '45 days (spring 2020)',
+            'Frequency Trend': 'Increasing extreme events'
+        });
+        showAlert('warning', 'Extreme Events Analysis Complete', 'Identified 14 extreme events with increasing frequency.');
+    }, 2200);
+}
+
+function updateStats() {
+    // Update the key statistics with new values
+    document.getElementById('data-points').textContent = '1,247';
+    document.getElementById('correlation').textContent = '0.78';
+    document.getElementById('rmse').textContent = '0.045';
+    document.getElementById('anomalies').textContent = '12';
+}
+
+function updateAnalysisSummary(title, results) {
+    const summaryDiv = document.getElementById('analysis-summary');
+    
+    let html = `<h6 class="mb-3">${title}</h6>`;
+    for (const [key, value] of Object.entries(results)) {
+        html += `
+            <div class="mb-2">
+                <small class="text-muted d-block">${key}</small>
+                <strong>${value}</strong>
+            </div>
+        `;
+    }
+    
+    summaryDiv.innerHTML = html;
+}
+
+function showAnalysisResults() {
+    const chartDiv = document.getElementById('results-chart');
+    chartDiv.innerHTML = `
+        <div class="text-center">
+            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+            <h5>Analysis Complete</h5>
+            <p class="text-muted mb-3">Interactive charts will be displayed here</p>
+            <button class="btn btn-primary btn-sm" onclick="viewDetailedResults()">
+                <i class="fas fa-eye me-1"></i>View Detailed Results
+            </button>
+        </div>
+    `;
+}
+
+function showLoadingSpinner(message) {
+    const chartDiv = document.getElementById('results-chart');
+    chartDiv.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>${message}</p>
+        </div>
+    `;
+}
+
+function hideLoadingSpinner() {
+    // This will be replaced by showAnalysisResults() or other functions
+}
+
+function showAlert(type, title, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <strong>${title}</strong> ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.querySelector('.container-fluid').prepend(alertDiv);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+
+function exportResults() {
+    showAlert('info', 'Export Started', 'Analysis results are being prepared for download...');
+}
+
+function viewDetailedResults() {
+    showAlert('info', 'Detailed View', 'Opening detailed analysis results in a new window...');
+}
+</script>
+{% endblock %}

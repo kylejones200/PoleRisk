@@ -1,0 +1,19 @@
+UTILITY POLE MAINTENANCE REPORT
+==================================================
+
+Assessment Date: 2025-10-03 21:00:11
+
+SUMMARY
+--------------------
+Total Poles Assessed: 3
+Poles Requiring Urgent Attention: 0
+Urgent Poles Percentage: 0.0%
+Total Estimated Maintenance Cost: $721.88
+Average Cost Per Pole: $240.63
+
+PRIORITY BREAKDOWN
+--------------------
+Critical: 0 poles, $0.00
+High: 0 poles, $0.00
+Medium: 0 poles, $0.00
+Low: 3 poles, $721.88

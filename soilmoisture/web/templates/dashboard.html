@@ -1,0 +1,695 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Soil Moisture Analyzer{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+        <p class="text-muted">Interactive analysis of soil moisture data</p>
+    </div>
+</div>
+
+<!-- Alert container -->
+<div id="alert-container"></div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-primary mb-2">
+                    <i class="fas fa-database fa-2x"></i>
+                </div>
+                <h6 class="card-title text-muted">Total Samples</h6>
+                <h4 id="total-samples" class="text-primary">-</h4>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-success mb-2">
+                    <i class="fas fa-chart-line fa-2x"></i>
+                </div>
+                <h6 class="card-title text-muted">Correlation</h6>
+                <h4 id="correlation" class="text-success">-</h4>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-info mb-2">
+                    <i class="fas fa-thermometer-half fa-2x"></i>
+                </div>
+                <h6 class="card-title text-muted">In-situ Mean</h6>
+                <h4 id="insitu-mean" class="text-info">-</h4>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-warning mb-2">
+                    <i class="fas fa-satellite fa-2x"></i>
+                </div>
+                <h6 class="card-title text-muted">Satellite Mean</h6>
+                <h4 id="satellite-mean" class="text-warning">-</h4>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-danger mb-2">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                </div>
+                <h6 class="card-title text-muted">Data Coverage</h6>
+                <h4 id="data-coverage" class="text-danger">-</h4>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <div class="text-secondary mb-2">
+                    <i class="fas fa-calendar-alt fa-2x"></i>
+                </div>
+                <h6 class="card-title text-muted">Date Range</h6>
+                <small id="date-range" class="text-secondary">-</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Control Panel -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-sliders-h"></i> Visualization Controls</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="plot-type" class="form-label">Plot Type</label>
+                            <select class="form-select" id="plot-type">
+                                <option value="timeseries" selected>Time Series</option>
+                                <option value="scatter">Scatter Plot</option>
+                                <option value="histogram">Distribution</option>
+                                <option value="boxplot">Box Plot</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Actions</label>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" onclick="updatePlot()">
+                                    <i class="fas fa-sync-alt"></i> Update Plot
+                                </button>
+                                <button class="btn btn-success" onclick="refreshData()">
+                                    <i class="fas fa-refresh"></i> Refresh Data
+                                </button>
+                                <button class="btn btn-info" onclick="exportData('csv')">
+                                    <i class="fas fa-download"></i> Export CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Plot -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-chart-area"></i> Visualization</h5>
+            </div>
+            <div class="card-body">
+                <div id="plot-loading" class="loading">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Loading visualization...</p>
+                </div>
+                <div id="main-chart" class="chart-container">
+                    <canvas id="main-chart-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fas fa-table"></i> Data Preview</h5>
+            </div>
+            <div class="card-body">
+                <div id="table-loading" class="loading">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2">Loading data table...</p>
+                </div>
+                <div id="data-table-container" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="data-table">
+                            <thead>
+                                <tr id="table-header"></tr>
+                            </thead>
+                            <tbody id="table-body"></tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-muted">
+                        <small>Showing first 10 rows of data</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let dashboardData = null;
+let currentChart = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+});
+
+async function loadDashboardData() {
+    try {
+        showLoading('plot-loading');
+        showLoading('table-loading');
+        
+        const data = await apiRequest('/dashboard-data');
+        dashboardData = data;
+        
+        updateStatistics(data);
+        await updatePlot();
+        updateDataTable(data);
+        
+        hideLoading('plot-loading');
+        hideLoading('table-loading');
+        document.getElementById('data-table-container').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+        showAlert('Failed to load dashboard data. Please check if data is uploaded.', 'danger');
+        hideLoading('plot-loading');
+        hideLoading('table-loading');
+    }
+}
+
+function updateStatistics(data) {
+    // Update statistics cards
+    document.getElementById('total-samples').textContent = data.n_samples || 'N/A';
+    document.getElementById('correlation').textContent = formatNumber(data.correlation, 3);
+    
+    if (data.stats.in_situ) {
+        document.getElementById('insitu-mean').textContent = formatNumber(data.stats.in_situ.mean, 3);
+    }
+    
+    if (data.stats.satellite) {
+        document.getElementById('satellite-mean').textContent = formatNumber(data.stats.satellite.mean, 3);
+    }
+    
+    // Calculate data coverage
+    if (data.stats.satellite && data.stats.in_situ) {
+        const coverage = Math.min(data.stats.satellite.count, data.stats.in_situ.count) / data.n_samples * 100;
+        document.getElementById('data-coverage').textContent = formatNumber(coverage, 1) + '%';
+    }
+    
+    // Date range
+    if (data.data.dates && data.data.dates.length > 0) {
+        const startDate = data.data.dates[0];
+        const endDate = data.data.dates[data.data.dates.length - 1];
+        document.getElementById('date-range').textContent = `${startDate} to ${endDate}`;
+    }
+}
+
+async function updatePlot() {
+    if (!dashboardData) {
+        showAlert('No data available for plotting', 'warning');
+        return;
+    }
+    
+    const plotType = document.getElementById('plot-type').value;
+    
+    try {
+        showLoading('plot-loading');
+        
+        // Destroy existing chart if it exists
+        if (currentChart) {
+            currentChart.destroy();
+            currentChart = null;
+        }
+        
+        createChart(plotType, dashboardData);
+        
+        hideLoading('plot-loading');
+        
+    } catch (error) {
+        hideLoading('plot-loading');
+        showAlert(`Failed to create ${plotType} chart: ${error.message}`, 'danger');
+    }
+}
+
+function createChart(type, data) {
+    const ctx = document.getElementById('main-chart-canvas').getContext('2d');
+    
+    let chartConfig;
+    
+    switch(type) {
+        case 'timeseries':
+            chartConfig = createTimeSeriesChart(data);
+            break;
+        case 'scatter':
+            chartConfig = createScatterChart(data);
+            break;
+        case 'histogram':
+            chartConfig = createHistogramChart(data);
+            break;
+        case 'boxplot':
+            chartConfig = createBoxPlotChart(data);
+            break;
+        default:
+            chartConfig = createTimeSeriesChart(data);
+    }
+    
+    currentChart = new Chart(ctx, chartConfig);
+}
+
+function createTimeSeriesChart(data) {
+    const datasets = [];
+    
+    if (data.data.dates && data.data.in_situ) {
+        datasets.push({
+            label: 'In-situ',
+            data: data.data.dates.map((date, i) => ({
+                x: date,
+                y: data.data.in_situ[i]
+            })).filter(point => point.y !== null && point.y !== undefined),
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.1
+        });
+    }
+    
+    if (data.data.dates && data.data.satellite) {
+        datasets.push({
+            label: 'Satellite',
+            data: data.data.dates.map((date, i) => ({
+                x: date,
+                y: data.data.satellite[i]
+            })).filter(point => point.y !== null && point.y !== undefined),
+            borderColor: '#ffc107',
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.1
+        });
+    }
+    
+    return {
+        type: 'line',
+        data: { datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Soil Moisture Time Series',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        parser: 'YYYY-MM-DD',
+                        displayFormats: {
+                            day: 'MMM DD',
+                            week: 'MMM DD',
+                            month: 'MMM YYYY'
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Soil Moisture (m³/m³)'
+                    },
+                    beginAtZero: false
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    };
+}
+
+function createScatterChart(data) {
+    const scatterData = [];
+    
+    if (data.data.in_situ && data.data.satellite) {
+        for (let i = 0; i < data.data.in_situ.length; i++) {
+            const insitu = data.data.in_situ[i];
+            const satellite = data.data.satellite[i];
+            
+            if (insitu !== null && insitu !== undefined && 
+                satellite !== null && satellite !== undefined) {
+                scatterData.push({
+                    x: insitu,
+                    y: satellite
+                });
+            }
+        }
+    }
+    
+    return {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Satellite vs In-situ',
+                data: scatterData,
+                backgroundColor: 'rgba(0, 123, 255, 0.6)',
+                borderColor: '#007bff',
+                borderWidth: 1,
+                pointRadius: 4,
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Satellite vs In-situ Soil Moisture',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'In-situ Soil Moisture (m³/m³)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Satellite Soil Moisture (m³/m³)'
+                    }
+                }
+            }
+        }
+    };
+}
+
+function createHistogramChart(data) {
+    const bins = 20;
+    let insituHist = null;
+    let satelliteHist = null;
+    
+    if (data.data.in_situ) {
+        const filteredInsitu = data.data.in_situ.filter(v => v !== null && v !== undefined);
+        insituHist = createHistogramBins(filteredInsitu, bins);
+    }
+    
+    if (data.data.satellite) {
+        const filteredSatellite = data.data.satellite.filter(v => v !== null && v !== undefined);
+        satelliteHist = createHistogramBins(filteredSatellite, bins);
+    }
+    
+    const datasets = [];
+    
+    if (insituHist) {
+        datasets.push({
+            label: 'In-situ Distribution',
+            data: insituHist.bins.map((count, i) => ({
+                x: insituHist.binCenters[i],
+                y: count
+            })),
+            backgroundColor: 'rgba(0, 123, 255, 0.6)',
+            borderColor: '#007bff',
+            borderWidth: 1
+        });
+    }
+    
+    if (satelliteHist) {
+        datasets.push({
+            label: 'Satellite Distribution',
+            data: satelliteHist.bins.map((count, i) => ({
+                x: satelliteHist.binCenters[i],
+                y: count
+            })),
+            backgroundColor: 'rgba(255, 193, 7, 0.6)',
+            borderColor: '#ffc107',
+            borderWidth: 1
+        });
+    }
+    
+    return {
+        type: 'bar',
+        data: { datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Soil Moisture Distribution',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Soil Moisture (m³/m³)'
+                    },
+                    type: 'linear',
+                    position: 'bottom'
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Frequency'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+}
+
+function createBoxPlotChart(data) {
+    // Chart.js doesn't have native box plots, so we'll create a bar chart with error bars
+    const datasets = [];
+    
+    if (data.stats.in_situ) {
+        datasets.push({
+            label: 'In-situ Statistics',
+            data: [{
+                x: 'In-situ',
+                y: data.stats.in_situ.mean,
+            }],
+            backgroundColor: 'rgba(0, 123, 255, 0.6)',
+            borderColor: '#007bff',
+            borderWidth: 2
+        });
+    }
+    
+    if (data.stats.satellite) {
+        datasets.push({
+            label: 'Satellite Statistics',
+            data: [{
+                x: 'Satellite',
+                y: data.stats.satellite.mean,
+            }],
+            backgroundColor: 'rgba(255, 193, 7, 0.6)',
+            borderColor: '#ffc107',
+            borderWidth: 2
+        });
+    }
+    
+    return {
+        type: 'bar',
+        data: { datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Soil Moisture Statistics Comparison',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Soil Moisture (m³/m³)'
+                    },
+                    beginAtZero: false
+                }
+            }
+        }
+    };
+}
+
+function createHistogramBins(data, numBins) {
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const binWidth = (max - min) / numBins;
+    
+    const bins = new Array(numBins).fill(0);
+    const binCenters = new Array(numBins);
+    
+    // Calculate bin centers
+    for (let i = 0; i < numBins; i++) {
+        binCenters[i] = min + (i + 0.5) * binWidth;
+    }
+    
+    // Count data points in each bin
+    data.forEach(value => {
+        const binIndex = Math.min(Math.floor((value - min) / binWidth), numBins - 1);
+        bins[binIndex]++;
+    });
+    
+    return { bins, binCenters };
+}
+
+function updateDataTable(data) {
+    const tableHeader = document.getElementById('table-header');
+    const tableBody = document.getElementById('table-body');
+    
+    // Clear existing content
+    tableHeader.innerHTML = '';
+    tableBody.innerHTML = '';
+    
+    if (!data.data || !data.data.dates || data.data.dates.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No data available</td></tr>';
+        return;
+    }
+    
+    // Create headers
+    const headers = ['Date'];
+    if (data.data.in_situ && data.data.in_situ.length > 0) headers.push('In-situ');
+    if (data.data.satellite && data.data.satellite.length > 0) headers.push('Satellite');
+    
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        tableHeader.appendChild(th);
+    });
+    
+    // Create rows (first 10)
+    const numRows = Math.min(10, data.data.dates.length);
+    
+    for (let i = 0; i < numRows; i++) {
+        const row = document.createElement('tr');
+        
+        // Date
+        const dateCell = document.createElement('td');
+        dateCell.textContent = data.data.dates[i] || 'N/A';
+        row.appendChild(dateCell);
+        
+        // In-situ
+        if (data.data.in_situ) {
+            const insituCell = document.createElement('td');
+            const value = data.data.in_situ[i];
+            insituCell.textContent = value !== null && value !== undefined ? formatNumber(value, 4) : 'N/A';
+            row.appendChild(insituCell);
+        }
+        
+        // Satellite
+        if (data.data.satellite) {
+            const satelliteCell = document.createElement('td');
+            const value = data.data.satellite[i];
+            satelliteCell.textContent = value !== null && value !== undefined ? formatNumber(value, 4) : 'N/A';
+            row.appendChild(satelliteCell);
+        }
+        
+        tableBody.appendChild(row);
+    }
+}
+
+async function refreshData() {
+    showAlert('Refreshing dashboard data...', 'info');
+    await loadDashboardData();
+    showAlert('Dashboard data refreshed successfully!', 'success');
+}
+
+async function exportData(format) {
+    try {
+        const response = await apiRequest(`/export-data?format=${format}`);
+        
+        // Create downloadable file
+        const blob = new Blob([response.data], { type: response.content_type });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = response.filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        showAlert(`Data exported as ${response.filename}`, 'success');
+        
+    } catch (error) {
+        showAlert(`Failed to export data: ${error.message}`, 'danger');
+    }
+}
+
+// Handle plot type change
+document.getElementById('plot-type').addEventListener('change', function() {
+    if (dashboardData) {
+        updatePlot();
+    }
+});
+</script>
+{% endblock %}

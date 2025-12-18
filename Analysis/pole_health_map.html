@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_2eb1424a1072f5a190c723cbf9bd9ef3 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+        <div style="position: fixed; 
+                    bottom: 50px; left: 50px; width: 150px; height: 120px; 
+                    background-color: white; border:2px solid grey; z-index:9999; 
+                    font-size:14px; padding: 10px">
+        <p><b>Maintenance Priority</b></p>
+        <p><i class="fa fa-circle" style="color:red"></i> Critical</p>
+        <p><i class="fa fa-circle" style="color:orange"></i> High</p>
+        <p><i class="fa fa-circle" style="color:yellow"></i> Medium</p>
+        <p><i class="fa fa-circle" style="color:green"></i> Low</p>
+        </div>
+        
+    
+            <div class="folium-map" id="map_2eb1424a1072f5a190c723cbf9bd9ef3" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_2eb1424a1072f5a190c723cbf9bd9ef3 = L.map(
+                "map_2eb1424a1072f5a190c723cbf9bd9ef3",
+                {
+                    center: [40.71633333333333, -73.97856666666667],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 10,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_b8d07d94b1cbd93b39e1f4bd6a39e8e1 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_b8d07d94b1cbd93b39e1f4bd6a39e8e1.addTo(map_2eb1424a1072f5a190c723cbf9bd9ef3);
+        
+    
+            var circle_marker_07677506161b7e177a6ec045664ae739 = L.circleMarker(
+                [40.7128, -74.006],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(map_2eb1424a1072f5a190c723cbf9bd9ef3);
+        
+    
+        var popup_8371b4b25724d3241574b9e5008747d9 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_aa46cdaf6e8d094f19e7ecd3f206c711 = $(`<div id="html_aa46cdaf6e8d094f19e7ecd3f206c711" style="width: 100.0%; height: 100.0%;">             <b>Pole ID:</b> P001<br>             <b>Health Score:</b> 99.3/100<br>             <b>Priority:</b> Low<br>             <b>Pole Type:</b> wood<br>             <b>Age:</b> 15.4 years<br>             <b>Safety Risk:</b> 0.007<br>             <b>Reliability Risk:</b> 0.007             </div>`)[0];
+                popup_8371b4b25724d3241574b9e5008747d9.setContent(html_aa46cdaf6e8d094f19e7ecd3f206c711);
+            
+        
+
+        circle_marker_07677506161b7e177a6ec045664ae739.bindPopup(popup_8371b4b25724d3241574b9e5008747d9)
+        ;
+
+        
+    
+    
+            var circle_marker_4997241dc927dc93519aa81266d5ef11 = L.circleMarker(
+                [40.758, -73.9855],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(map_2eb1424a1072f5a190c723cbf9bd9ef3);
+        
+    
+        var popup_e5615bac1d6067ed0a3eba1e03cc2d9b = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4e6801d682a788975b855004fc443f3b = $(`<div id="html_4e6801d682a788975b855004fc443f3b" style="width: 100.0%; height: 100.0%;">             <b>Pole ID:</b> P002<br>             <b>Health Score:</b> 98.4/100<br>             <b>Priority:</b> Low<br>             <b>Pole Type:</b> concrete<br>             <b>Age:</b> 20.1 years<br>             <b>Safety Risk:</b> 0.039<br>             <b>Reliability Risk:</b> 0.016             </div>`)[0];
+                popup_e5615bac1d6067ed0a3eba1e03cc2d9b.setContent(html_4e6801d682a788975b855004fc443f3b);
+            
+        
+
+        circle_marker_4997241dc927dc93519aa81266d5ef11.bindPopup(popup_e5615bac1d6067ed0a3eba1e03cc2d9b)
+        ;
+
+        
+    
+    
+            var circle_marker_3793ecfecc5f3200d6bfe2a750176be0 = L.circleMarker(
+                [40.6782, -73.9442],
+                {"bubblingMouseEvents": true, "color": "black", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "green", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(map_2eb1424a1072f5a190c723cbf9bd9ef3);
+        
+    
+        var popup_8676dbe7ed06236677ea28775f1b0a88 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_21034544568e5fc2555310c007814118 = $(`<div id="html_21034544568e5fc2555310c007814118" style="width: 100.0%; height: 100.0%;">             <b>Pole ID:</b> P003<br>             <b>Health Score:</b> 99.1/100<br>             <b>Priority:</b> Low<br>             <b>Pole Type:</b> steel<br>             <b>Age:</b> 10.6 years<br>             <b>Safety Risk:</b> 0.024<br>             <b>Reliability Risk:</b> 0.009             </div>`)[0];
+                popup_8676dbe7ed06236677ea28775f1b0a88.setContent(html_21034544568e5fc2555310c007814118);
+            
+        
+
+        circle_marker_3793ecfecc5f3200d6bfe2a750176be0.bindPopup(popup_8676dbe7ed06236677ea28775f1b0a88)
+        ;
+
+        
+    
+</script>
+</html>

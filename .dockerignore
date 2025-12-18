@@ -1,0 +1,72 @@
+# Git and version control
+.git/
+.gitignore
+.github/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+logs/
+temp/
+tmp/
+
+# Data and output directories (keep structure but exclude large files)
+data/*.csv
+data/*.nc
+data/*.nc4
+output/*.png
+output/*.html
+output/*.joblib
+uploads/*
+
+# Documentation build
+docs/_build/
+docs/source/_build/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Node modules (if any)
+node_modules/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Analysis results
+Analysis/
+ML_Demo_Output/
+
+# Backup files
+*_backup/
+*.bak
+*.orig

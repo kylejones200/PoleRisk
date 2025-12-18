@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}ML Models{% endblock %}
+
+{% block head %}
+<style>
+    .model-card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        transition: box-shadow 0.2s;
+    }
+    .model-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .model-status {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+    }
+    .status-trained {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .status-training {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .status-not-trained {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-brain me-2"></i>Machine Learning Models</h1>
+                <div>
+                    <button class="btn btn-primary" onclick="trainNewModel()">
+                        <i class="fas fa-plus me-2"></i>Train New Model
+                    </button>
+                </div>
+            </div>
+
+            <!-- Model Cards -->
+            <div class="row" id="model-cards">
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="model-card p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="mb-0">Random Forest</h5>
+                            <span class="model-status status-not-trained">Not Trained</span>
+                        </div>
+                        <p class="text-muted mb-2">
+                            Ensemble learning method for regression and classification tasks.
+                            Great for handling non-linear relationships.
+                        </p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <strong>Features:</strong> Robust, handles missing values, feature importance
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="trainModel('random_forest')">
+                                <i class="fas fa-play me-1"></i>Train
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="fas fa-download me-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="model-card p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="mb-0">Neural Network</h5>
+                            <span class="model-status status-not-trained">Not Trained</span>
+                        </div>
+                        <p class="text-muted mb-2">
+                            Multi-layer perceptron for complex pattern recognition.
+                            Excellent for non-linear relationships.
+                        </p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <strong>Features:</strong> Deep learning, pattern recognition, adaptive
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="trainModel('mlp')">
+                                <i class="fas fa-play me-1"></i>Train
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="fas fa-download me-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="model-card p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="mb-0">LSTM</h5>
+                            <span class="model-status status-not-trained">Not Trained</span>
+                        </div>
+                        <p class="text-muted mb-2">
+                            Long Short-Term Memory network for time series forecasting.
+                            Ideal for temporal patterns in soil moisture data.
+                        </p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <strong>Features:</strong> Time series, memory, forecasting
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="trainModel('lstm')">
+                                <i class="fas fa-play me-1"></i>Train
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="fas fa-download me-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="model-card p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="mb-0">Support Vector Machine</h5>
+                            <span class="model-status status-not-trained">Not Trained</span>
+                        </div>
+                        <p class="text-muted mb-2">
+                            SVM regression for robust prediction with kernel tricks.
+                            Good for high-dimensional feature spaces.
+                        </p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <strong>Features:</strong> Kernel methods, robust, high-dimensional
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="trainModel('svm')">
+                                <i class="fas fa-play me-1"></i>Train
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="fas fa-download me-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="model-card p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="mb-0">Linear Regression</h5>
+                            <span class="model-status status-not-trained">Not Trained</span>
+                        </div>
+                        <p class="text-muted mb-2">
+                            Simple linear model for baseline comparisons.
+                            Fast training and interpretable results.
+                        </p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <strong>Features:</strong> Fast, interpretable, baseline
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="trainModel('linear_regression')">
+                                <i class="fas fa-play me-1"></i>Train
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="fas fa-download me-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="model-card p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="mb-0">Anomaly Detection</h5>
+                            <span class="model-status status-not-trained">Not Trained</span>
+                        </div>
+                        <p class="text-muted mb-2">
+                            Isolation Forest for detecting anomalous soil moisture values.
+                            Unsupervised outlier detection.
+                        </p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <strong>Features:</strong> Unsupervised, outlier detection, anomalies
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-warning" onclick="runAnomalyDetection()">
+                                <i class="fas fa-search me-1"></i>Detect
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="fas fa-download me-1"></i>Results
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Progress Modal -->
+            <div class="modal fade" id="trainingModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Training Model</h5>
+                        </div>
+                        <div class="modal-body">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border text-primary me-3" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div>
+                                    <p class="mb-1" id="training-status">Preparing data and features...</p>
+                                    <small class="text-muted">This may take a few minutes depending on data size.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function trainModel(modelType) {
+    // Show training modal
+    const modal = new bootstrap.Modal(document.getElementById('trainingModal'));
+    modal.show();
+    
+    // Update status
+    document.getElementById('training-status').textContent = `Training ${modelType} model...`;
+    
+    // Here you would make an API call to train the model
+    console.log(`Training model: ${modelType}`);
+    
+    // Simulate training completion (replace with actual API call)
+    setTimeout(() => {
+        modal.hide();
+        
+        // Show success message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <strong>Success!</strong> ${modelType} model has been trained successfully.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.querySelector('.container-fluid').prepend(alertDiv);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+        
+    }, 3000); // Simulate 3 second training time
+}
+
+function runAnomalyDetection() {
+    const modal = new bootstrap.Modal(document.getElementById('trainingModal'));
+    modal.show();
+    
+    document.getElementById('training-status').textContent = 'Running anomaly detection...';
+    
+    setTimeout(() => {
+        modal.hide();
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <strong>Anomaly Detection Complete!</strong> Found 3 potential anomalies in your data.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.querySelector('.container-fluid').prepend(alertDiv);
+        
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+        
+    }, 2000);
+}
+
+function trainNewModel() {
+    // This would typically open a modal with model configuration options
+    alert('Model training wizard would open here. Select data, features, and model parameters.');
+}
+</script>
+{% endblock %}
