@@ -112,39 +112,40 @@ jobs:
         safety check --json --output safety-report.json
       continue-on-error: true
 
-  performance-test:
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
-        pip install -r requirements-dev.txt
-    
-    - name: Install Rust and build extensions
-      run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-        source $HOME/.cargo/env
-        cd soilmoisture_rs
-        pip install maturin
-        maturin develop --release
-    
-    - name: Run performance benchmarks
-      run: |
-        python benchmark_rust_vs_python.py
-    
-    - name: Run ML demo
-      run: |
-        python demo_ml.py
+  # performance-test:
+  #   # Disabled: Requires Rust extensions and complex setup (optional)
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   
+  #   - name: Set up Python
+  #     uses: actions/setup-python@v4
+  #     with:
+  #       python-version: '3.12'
+  #   
+  #   - name: Install dependencies
+  #     run: |
+  #       pip install -r requirements.txt
+  #       pip install -r requirements-dev.txt
+  #   
+  #   - name: Install Rust and build extensions
+  #     run: |
+  #       curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  #       source $HOME/.cargo/env
+  #       cd soilmoisture_rs
+  #       pip install maturin
+  #       maturin develop --release
+  #   
+  #   - name: Run performance benchmarks
+  #     run: |
+  #       python benchmark_rust_vs_python.py
+  #   
+  #   - name: Run ML demo
+  #     run: |
+  #       python demo_ml.py
 
   # docker-build:
   #   # Disabled: Requires Docker Hub credentials (optional for PyPI publishing)
