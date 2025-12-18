@@ -1,15 +1,15 @@
 import numpy as np
-from soilmoisture_rs import (
-
 import logging
-logger = logging.getLogger(__name__)
 
+from soilmoisture_rs import (
     calculate_rmse_rs,
     calculate_correlation_rs,
     calculate_mae_rs,
     calculate_bias_rs,
     calculate_ubrmse_rs
 )
+
+logger = logging.getLogger(__name__)
 
 def main():
     # Generate test data
