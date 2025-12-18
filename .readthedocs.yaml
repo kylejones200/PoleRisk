@@ -1,156 +1,29 @@
-# .readthedocs.yml
+# .readthedocs.yaml
 # Read the Docs configuration file
 # See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 
-# Required
 version: 2
 
-# Set the version of Python and other tools you might need
+# Set the version of Python and other tools
 build:
   os: ubuntu-22.04
   tools:
-    python: "3.9"
+    python: "3.12"
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
   configuration: docs/source/conf.py
 
-# Optionally set the version of Python and requirements required to build your docs
+# Python configuration
 python:
-  version: "3.9"
   install:
-    - requirements: requirements.txt
     - requirements: requirements-docs.txt
     - method: pip
       path: .
       extra_requirements:
-        - docs
+        - dev
 
-# Optionally build your docs in additional formats such as PDF
-data:
-  directory: docs/
-
-# Optionally set the default version to serve (defaults to "latest")
-# This is also used if you have a "stable" version and want to set the default
-# version to something else, like "latest
-defaults:
-  version: latest
-  features:
-    # Enable this to get a "View page source" link in the top right of the page
-    # that links to the source file in your repository
-    docsearch: false
-    # Enable this to get a "Edit on GitHub" link in the top right of the page
-    # that links to the source file in your repository
-    edit_on_github: true
-    # The following are the values used for the edit_on_github feature
-    github_url: https://github.com/kylejones200/soil-moisture-analyzer
-    github_repo: kylejones200/soil-moisture-analyzer
-    github_version: main  # or the branch you want to use for the docs
-    github_src_path: docs/source/  # path in your repo to the docs source
-
-# Optionally include additional files in your documentation
-# This can be used to include static files, templates, etc.
-# that are not in your source directory
-# For example:
-# include:
-#   - README.md
-#   - CHANGELOG.md
-#   - LICENSE
-#   - docs/_static/
-
-# Optionally exclude files from the build
-# exclude:
-#   - docs/_build/
-#   - docs/Thumbs.db
-#   - .DS_Store
-
-# Optionally add redirects for moved or renamed pages
-# redirects:
-#   - source: /old/path
-#     destination: /new/path
-#     type: exact
-
-# Optionally add a custom domain
-# domains:
-#   - yourdomain.com
-
-# Optionally add a custom 404 page
-# error: 404.html
-
-# Optionally add a custom 500 page
-# error: 500.html
-
-# Optionally add a custom 403 page
-# error: 403.html
-
-# Optionally add a custom 400 page
-# error: 400.html
-
-# Optionally add a custom 401 page
-# error: 401.html
-
-# Optionally add a custom 410 page
-# error: 410.html
-
-# Optionally add a custom 503 page
-# error: 503.html
-
-# Optionally add a custom 504 page
-# error: 504.html
-
-# Optionally add a custom 502 page
-# error: 502.html
-
-# Optionally add a custom 500 page
-# error: 500.html
-
-# Optionally add a custom 404 page
-# error: 404.html
-
-# Optionally add a custom 403 page
-# error: 403.html
-
-# Optionally add a custom 400 page
-# error: 400.html
-
-# Optionally add a custom 401 page
-# error: 401.html
-
-# Optionally add a custom 410 page
-# error: 410.html
-
-# Optionally add a custom 503 page
-# error: 503.html
-
-# Optionally add a custom 504 page
-# error: 504.html
-
-# Optionally add a custom 502 page
-# error: 502.html
-
-# Optionally add a custom 500 page
-# error: 500.html
-
-# Optionally add a custom 404 page
-# error: 404.html
-
-# Optionally add a custom 403 page
-# error: 403.html
-
-# Optionally add a custom 400 page
-# error: 400.html
-
-# Optionally add a custom 401 page
-# error: 401.html
-
-# Optionally add a custom 410 page
-# error: 410.html
-
-# Optionally add a custom 503 page
-# error: 503.html
-
-# Optionally add a custom 504 page
-# error: 504.html
-
-# Optionally add a custom 502 page
-# error: 502.html
+# Build documentation in additional formats
+formats:
+  - pdf
+  - epub
