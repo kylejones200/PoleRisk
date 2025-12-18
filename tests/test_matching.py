@@ -9,7 +9,9 @@ import soilmoisture.core.matching as matching
 def test_get_morning_measurements_basic():
     times = ["00:29", "00:30", "01:15", "02:30", "02:31"]
     sm = [0.1, 0.2, 0.3, 0.4, 0.5]
-    morning_sm, morning_times = matching._get_morning_measurements(times, sm, "20200101")
+    morning_sm, morning_times = matching._get_morning_measurements(
+        times, sm, "20200101"
+    )
     assert morning_times == ["00:30", "01:15", "02:30"]
     np.testing.assert_allclose(morning_sm, [0.2, 0.3, 0.4])
 
@@ -31,7 +33,9 @@ def test_convert_to_local_time_filters_invalid_and_uses_utc2local(monkeypatch):
 
     def fake_utc2local(lon, utc_date, utc_time):
         calls.append((lon, utc_date, utc_time))
-        return ("20200101", "05:00") if utc_date == "20200101" else ("20200102", "18:30")
+        return (
+            ("20200101", "05:00") if utc_date == "20200101" else ("20200102", "18:30")
+        )
 
     monkeypatch.setattr(matching, "utc2local", fake_utc2local)
 
@@ -71,9 +75,12 @@ def test_match_insitu_with_lprm_end_to_end(tmp_path, monkeypatch):
         return {"20200101": 1.0, "20200102": 2.0}.get(date, np.nan)
 
     import soilmoisture.core as core_pkg
+
     monkeypatch.setattr(core_pkg, "get_lprm_des", fake_get_lprm_des)
 
-    in_situ_series, satellite_series, result_dates = matching.match_insitu_with_lprm(insitu_path)
+    in_situ_series, satellite_series, result_dates = matching.match_insitu_with_lprm(
+        insitu_path
+    )
 
     # date1: morning window only includes 01:00 -> avg 0.20
     # date2: avg of 00:45 and 02:15 -> (0.30 + 0.40)/2 = 0.35

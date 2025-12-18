@@ -6,7 +6,7 @@ Core functionality for polerisk
 def hello_polerisk():
     """
     A simple hello world function to get started.
-    
+
     Returns:
         str: A greeting message
     """
@@ -14,4 +14,3 @@ def hello_polerisk():
 
 
 # Add your main classes and functions here
-

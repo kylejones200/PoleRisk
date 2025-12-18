@@ -1,12 +1,14 @@
 """Pytest-based integration tests for Rust-accelerated functions.
 Skips gracefully if the compiled Rust extension is not available.
 """
+
 import math
 import numpy as np
 import pytest
 
 try:
     import soilmoisture_rs as rust  # This may import the directory, not the compiled module
+
     REQUIRED_FUNCS = [
         "calculate_mae_rs",
         "calculate_rmse_rs",
@@ -40,7 +42,7 @@ def test_rmse_rs_basic():
     y = np.array([0.0, 2.0, 1.0])
     rmse = rust.calculate_rmse_rs(x, y)
     # diffs = [0, -1, 1], squares = [0,1,1], mse=2/3, rmse=sqrt(2/3)
-    assert math.isclose(rmse, math.sqrt(2/3), rel_tol=1e-12, abs_tol=1e-12)
+    assert math.isclose(rmse, math.sqrt(2 / 3), rel_tol=1e-12, abs_tol=1e-12)
 
 
 def test_correlation_rs_basic():

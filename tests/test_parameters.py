@@ -8,6 +8,7 @@ import soilmoisture.core.parameters as params_mod
 
 class FakeDataset:
     """Minimal fake for netCDF4.Dataset supporting context manager and variables access."""
+
     def __init__(self, path, mode="r", raise_on_enter=False, lat=None, lon=None):
         self.path = Path(path)
         self.mode = mode

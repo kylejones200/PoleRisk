@@ -12,4 +12,3 @@ __email__ = "kyletjones@gmail.com"
 __all__ = [
     "__version__",
 ]
-

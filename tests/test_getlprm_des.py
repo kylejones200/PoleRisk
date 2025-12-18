@@ -27,14 +27,14 @@ class FakeDS:
 def _install_fake_getpara(monkeypatch, lat, lon, files):
     # Mock ConfigManager.get_parameters instead of the old getpara module
     from soilmoisture.common.config import ConfigManager
-    
+
     def fake_get_parameters(force_refresh=False):
         return {
             "lat_lprm": np.array(lat),
             "lon_lprm": np.array(lon),
             "file_lprm_des": [Path(p) for p in files],
         }
-    
+
     monkeypatch.setattr(ConfigManager, "get_parameters", fake_get_parameters)
 
 
