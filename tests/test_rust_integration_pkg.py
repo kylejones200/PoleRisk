@@ -3,6 +3,8 @@ Test script to verify the integration of Rust-optimized statistical functions
 in the soilmoisture package.
 """
 import numpy as np
+import logging
+
 from soilmoisture.analysis import (
     calculate_rmse,
     calculate_correlation,
@@ -11,6 +13,8 @@ from soilmoisture.analysis import (
     calculate_ubrmse,
     RUST_AVAILABLE
 )
+
+logger = logging.getLogger(__name__)
 
 def test_statistical_functions():
     # Generate test data

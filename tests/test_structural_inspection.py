@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import random
 import os
 import sys
+import logging
 
 # Add the project root to Python path
 sys.path.append('/Users/k.jones/Documents/moisture')
@@ -19,6 +20,8 @@ from soilmoisture.pole_health.enhanced_models import (
 from soilmoisture.pole_health.structural_assessment import (
     StructuralConditionAnalyzer, EnhancedPoleHealthAssessment
 )
+
+logger = logging.getLogger(__name__)
 
 
 def create_sample_structural_inspections():

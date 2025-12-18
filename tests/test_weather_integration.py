@@ -8,6 +8,7 @@ import sys
 import os
 from datetime import datetime
 import pandas as pd
+import logging
 
 # Add project root to path
 sys.path.append('/Users/k.jones/Documents/moisture')
@@ -16,6 +17,8 @@ from soilmoisture.weather import (
     OpenWeatherMapProvider, WeatherRiskAssessment, 
     WeatherConditions, WeatherForecast, WeatherAlert
 )
+
+logger = logging.getLogger(__name__)
 
 
 def test_weather_integration():
