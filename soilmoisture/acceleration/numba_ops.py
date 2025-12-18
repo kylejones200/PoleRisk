@@ -14,6 +14,9 @@ Key acceleration areas:
 import numpy as np
 from typing import Tuple, Optional
 import warnings
+import logging
+
+logger = logging.getLogger(__name__)
 
 try:
     import numba

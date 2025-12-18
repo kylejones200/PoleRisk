@@ -13,6 +13,9 @@ logger = logging.getLogger(__name__)
 
 logger.debug('dashboard', __name__)
 
+# Create the Dashboard Blueprint
+dashboard_blueprint = Blueprint('dashboard', __name__)
+
 
 def load_sample_data():
     """Load or create sample data for dashboard demo."""

@@ -23,6 +23,9 @@ logger = logging.getLogger(__name__)
 
 logger.debug('api', __name__)
 
+# Create the API Blueprint
+api_blueprint = Blueprint('api', __name__, url_prefix='/api')
+
 
 def allowed_file(filename: str) -> bool:
     """Check if uploaded file has allowed extension."""

@@ -13,7 +13,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import warnings
+import logging
+
 warnings.filterwarnings('ignore')
+
+logger = logging.getLogger(__name__)
 
 # Set style
 plt.style.use('seaborn-v0_8')

@@ -17,6 +17,8 @@ import pandas as pd
 import seaborn as sns
 from scipy import stats
 
+logger = logging.getLogger(__name__)
+
 
 def plot_time_series(df: pd.DataFrame, output_dir: str = "Analysis") -> str:
     """

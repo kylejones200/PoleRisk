@@ -6,9 +6,12 @@ import pytest
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
+import logging
 
 from soilmoisture.advanced.time_series import TimeSeriesAnalyzer, TrendAnalyzer
 from soilmoisture.advanced.climatology import ClimatologyAnalyzer, SeasonalAnalyzer
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture

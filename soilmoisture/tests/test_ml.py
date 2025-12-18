@@ -6,6 +6,7 @@ import pytest
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error
+import logging
 
 from soilmoisture.ml.models import (
     SoilMoisturePredictor, 
@@ -18,6 +19,8 @@ from soilmoisture.ml.features import (
     create_weather_features,
     select_features
 )
+
+logger = logging.getLogger(__name__)
 
 
 @pytest.fixture

@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 import os
 import logging
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
