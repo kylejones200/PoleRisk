@@ -1,4 +1,3 @@
-import types
 from pathlib import Path
 import numpy as np
 import pytest
@@ -26,19 +25,17 @@ class FakeDS:
 
 
 def _install_fake_getpara(monkeypatch, lat, lon, files):
-    # Create a fake module soilmoisture.core.getpara with get_parameters
-    fake_module = types.ModuleType("soilmoisture.core.getpara")
-
-    def fake_get_parameters():
+    # Mock ConfigManager.get_parameters instead of the old getpara module
+    from soilmoisture.common.config import ConfigManager
+    
+    def fake_get_parameters(force_refresh=False):
         return {
             "lat_lprm": np.array(lat),
             "lon_lprm": np.array(lon),
             "file_lprm_des": [Path(p) for p in files],
         }
-
-    fake_module.get_parameters = fake_get_parameters
-    import sys
-    sys.modules["soilmoisture.core.getpara"] = fake_module
+    
+    monkeypatch.setattr(ConfigManager, "get_parameters", fake_get_parameters)
 
 
 def test_returns_value_when_matching_date(tmp_path, monkeypatch):
