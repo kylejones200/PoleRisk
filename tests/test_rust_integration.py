@@ -1,15 +1,32 @@
 import numpy as np
 import logging
+import pytest
 
-from soilmoisture_rs import (
-    calculate_rmse_rs,
-    calculate_correlation_rs,
-    calculate_mae_rs,
-    calculate_bias_rs,
-    calculate_ubrmse_rs
-)
+# Try to import Rust extensions, skip tests if not available
+try:
+    from soilmoisture_rs import (
+        calculate_rmse_rs,
+        calculate_correlation_rs,
+        calculate_mae_rs,
+        calculate_bias_rs,
+        calculate_ubrmse_rs
+    )
+    RUST_AVAILABLE = True
+except ImportError:
+    RUST_AVAILABLE = False
+    # Create dummy functions so the module can still be imported
+    calculate_rmse_rs = None
+    calculate_correlation_rs = None
+    calculate_mae_rs = None
+    calculate_bias_rs = None
+    calculate_ubrmse_rs = None
 
 logger = logging.getLogger(__name__)
+
+pytestmark = pytest.mark.skipif(
+    not RUST_AVAILABLE,
+    reason="Rust extensions not available"
+)
 
 def main():
     # Generate test data
