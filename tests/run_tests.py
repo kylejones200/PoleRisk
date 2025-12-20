@@ -36,9 +36,7 @@ def run_command(cmd, description):
 
 def main():
     """Main test runner function."""
-    parser = argparse.ArgumentParser(
-        description="Run tests for the polerisk package"
-    )
+    parser = argparse.ArgumentParser(description="Run tests for the polerisk package")
 
     parser.add_argument(
         "--type",

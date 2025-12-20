@@ -11,4 +11,3 @@ def test_hello_polerisk():
     result = hello_polerisk()
     assert result == "Hello from polerisk!"
     assert isinstance(result, str)
-
