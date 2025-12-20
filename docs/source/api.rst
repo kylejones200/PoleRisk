@@ -57,15 +57,10 @@ The package provides command-line tools for common tasks:
 
 .. code-block:: bash
 
-    # Process soil moisture data
-    soilmoisture-analyze --input input.nc --output results.csv
+    # Run pole health assessment
+    python -m polerisk.main --poles pole_data.csv --soil soil_data.csv
     
-    # Generate visualizations
-    soilmoisture-visualize --input results.csv --output-dir plots/
+    # Launch interactive dashboard
+    python dashboard_app.py
 
-For more information on the available options, run:
-
-.. code-block:: bash
-
-    soilmoisture-analyze --help
-    soilmoisture-visualize --help
+For more information, see the main module and dashboard documentation.
