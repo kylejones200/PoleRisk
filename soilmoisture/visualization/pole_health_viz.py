@@ -6,22 +6,19 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import signalplot
 from typing import Dict, List, Optional, Tuple
 import folium
 from folium import plugins
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import warnings
 import logging
 
 warnings.filterwarnings('ignore')
 
-logger = logging.getLogger(__name__)
+# Apply SignalPlot minimalist defaults
+signalplot.apply()
 
-# Set style
-plt.style.use('seaborn-v0_8')
-sns.set_palette("husl")
+logger = logging.getLogger(__name__)
 
 
 class PoleHealthVisualizer:

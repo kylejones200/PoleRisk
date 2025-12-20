@@ -5,14 +5,17 @@ Interactive web dashboard for utility pole health monitoring and maintenance pla
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import matplotlib.pyplot as plt
+import seaborn as sns
+import signalplot
 import folium
 from streamlit_folium import st_folium
 import os
 from datetime import datetime, timedelta
 import logging
+
+# Apply SignalPlot minimalist defaults
+signalplot.apply()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -205,70 +208,83 @@ class PoleDashboard:
         
         with col1:
             # Health score distribution
-            fig_health = px.histogram(
-                st.session_state.filtered_df, 
-                x='overall_health_score',
-                nbins=20,
-                title="Health Score Distribution",
-                color_discrete_sequence=['#1f77b4']
-            )
-            fig_health.add_vline(
-                x=st.session_state.filtered_df['overall_health_score'].mean(),
-                line_dash="dash",
-                line_color="red",
-                annotation_text=f"Mean: {st.session_state.filtered_df['overall_health_score'].mean():.1f}"
-            )
-            st.plotly_chart(fig_health, use_container_width=True)
+            fig_health, ax_health = plt.subplots(figsize=(8, 5))
+            ax_health.hist(st.session_state.filtered_df['overall_health_score'], 
+                          bins=20, alpha=0.7, color='#1f77b4', edgecolor='black')
+            mean_score = st.session_state.filtered_df['overall_health_score'].mean()
+            ax_health.axvline(mean_score, color='red', linestyle='--', 
+                            label=f'Mean: {mean_score:.1f}')
+            ax_health.set_xlabel('Health Score')
+            ax_health.set_ylabel('Frequency')
+            ax_health.set_title('Health Score Distribution')
+            ax_health.legend()
+            ax_health.grid(True, alpha=0.3)
+            plt.tight_layout()
+            st.pyplot(fig_health)
+            plt.close(fig_health)
         
         with col2:
             # Priority breakdown
             priority_counts = st.session_state.filtered_df['maintenance_priority'].value_counts()
-            fig_priority = px.pie(
-                values=priority_counts.values,
-                names=priority_counts.index,
-                title="Maintenance Priority Breakdown",
-                color_discrete_map=self.colors
-            )
-            st.plotly_chart(fig_priority, use_container_width=True)
+            fig_priority, ax_priority = plt.subplots(figsize=(8, 5))
+            colors_list = [self.colors.get(p, 'gray') for p in priority_counts.index]
+            ax_priority.pie(priority_counts.values, labels=priority_counts.index, 
+                          autopct='%1.1f%%', colors=colors_list, startangle=90)
+            ax_priority.set_title('Maintenance Priority Breakdown')
+            plt.tight_layout()
+            st.pyplot(fig_priority)
+            plt.close(fig_priority)
         
         col3, col4 = st.columns(2)
         
         with col3:
             # Pole type analysis
             type_health = st.session_state.filtered_df.groupby('pole_type')['overall_health_score'].agg(['mean', 'std']).reset_index()
-            fig_type = px.bar(
-                type_health, 
-                x='pole_type', 
-                y='mean',
-                error_y='std',
-                title="Average Health Score by Pole Type",
-                color='mean',
-                color_continuous_scale='RdYlGn'
-            )
-            st.plotly_chart(fig_type, use_container_width=True)
+            fig_type, ax_type = plt.subplots(figsize=(8, 5))
+            bars = ax_type.bar(type_health['pole_type'], type_health['mean'], 
+                              yerr=type_health['std'], capsize=5, alpha=0.7)
+            # Color bars by mean health score
+            for bar, mean_val in zip(bars, type_health['mean']):
+                if mean_val < 50:
+                    bar.set_color('#d32f2f')  # red
+                elif mean_val < 70:
+                    bar.set_color('#fbc02d')  # yellow
+                else:
+                    bar.set_color('#388e3c')  # green
+            ax_type.set_xlabel('Pole Type')
+            ax_type.set_ylabel('Average Health Score')
+            ax_type.set_title('Average Health Score by Pole Type')
+            ax_type.tick_params(axis='x', rotation=45)
+            ax_type.grid(True, alpha=0.3, axis='y')
+            plt.tight_layout()
+            st.pyplot(fig_type)
+            plt.close(fig_type)
         
         with col4:
-            # Risk factors radar chart
+            # Risk factors bar chart (replacing radar chart)
             risk_columns = ['moisture_risk', 'erosion_risk', 'chemical_corrosion_risk', 'bearing_capacity_risk']
             available_risks = [col for col in risk_columns if col in st.session_state.filtered_df.columns]
             
             if available_risks:
                 avg_risks = st.session_state.filtered_df[available_risks].mean()
-                
-                fig_radar = go.Figure()
-                fig_radar.add_trace(go.Scatterpolar(
-                    r=avg_risks.values,
-                    theta=[col.replace('_risk', '').replace('_', ' ').title() for col in avg_risks.index],
-                    fill='toself',
-                    name='Average Risk'
-                ))
-                fig_radar.update_layout(
-                    polar=dict(
-                        radialaxis=dict(visible=True, range=[0, 1])
-                    ),
-                    title="Average Risk Factors"
-                )
-                st.plotly_chart(fig_radar, use_container_width=True)
+                fig_risk, ax_risk = plt.subplots(figsize=(8, 5))
+                risk_labels = [col.replace('_risk', '').replace('_', ' ').title() for col in avg_risks.index]
+                bars = ax_risk.barh(risk_labels, avg_risks.values, alpha=0.7)
+                # Color by risk level
+                for bar, val in zip(bars, avg_risks.values):
+                    if val < 0.33:
+                        bar.set_color('#388e3c')  # green
+                    elif val < 0.66:
+                        bar.set_color('#fbc02d')  # yellow
+                    else:
+                        bar.set_color('#d32f2f')  # red
+                ax_risk.set_xlabel('Average Risk Score')
+                ax_risk.set_title('Average Risk Factors')
+                ax_risk.set_xlim(0, 1)
+                ax_risk.grid(True, alpha=0.3, axis='x')
+                plt.tight_layout()
+                st.pyplot(fig_risk)
+                plt.close(fig_risk)
     
     def render_map_tab(self):
         """Render interactive map tab."""
@@ -345,17 +361,21 @@ class PoleDashboard:
             if 'recommended_action_date' in schedule_filtered.columns:
                 schedule_filtered['recommended_action_date'] = pd.to_datetime(schedule_filtered['recommended_action_date'])
                 
-                # Timeline chart
-                fig_timeline = px.timeline(
-                    schedule_filtered,
-                    x_start='recommended_action_date',
-                    x_end='recommended_action_date',
-                    y='pole_id',
-                    color='maintenance_priority',
-                    title="Maintenance Timeline",
-                    color_discrete_map=self.colors
-                )
-                st.plotly_chart(fig_timeline, use_container_width=True)
+                # Timeline chart - bar chart showing days until action
+                fig_timeline, ax_timeline = plt.subplots(figsize=(10, max(6, len(schedule_filtered) * 0.3)))
+                schedule_sorted = schedule_filtered.sort_values('recommended_action_date')
+                y_pos = range(len(schedule_sorted))
+                colors_list = [self.colors.get(p, 'gray') for p in schedule_sorted['maintenance_priority']]
+                ax_timeline.barh(y_pos, schedule_sorted['days_until_action'] if 'days_until_action' in schedule_sorted.columns else [30]*len(schedule_sorted),
+                                color=colors_list, alpha=0.7)
+                ax_timeline.set_yticks(y_pos)
+                ax_timeline.set_yticklabels(schedule_sorted['pole_id'])
+                ax_timeline.set_xlabel('Days Until Action')
+                ax_timeline.set_title('Maintenance Timeline')
+                ax_timeline.grid(True, alpha=0.3, axis='x')
+                plt.tight_layout()
+                st.pyplot(fig_timeline)
+                plt.close(fig_timeline)
             
             # Maintenance table
             st.subheader("Detailed Schedule")
@@ -376,14 +396,17 @@ class PoleDashboard:
             if 'estimated_cost' in schedule_filtered.columns and 'maintenance_priority' in schedule_filtered.columns:
                 cost_by_priority = schedule_filtered.groupby('maintenance_priority')['estimated_cost'].sum()
                 
-                fig_cost = px.bar(
-                    x=cost_by_priority.index,
-                    y=cost_by_priority.values,
-                    title="Cost by Priority",
-                    color=cost_by_priority.index,
-                    color_discrete_map=self.colors
-                )
-                st.plotly_chart(fig_cost, use_container_width=True)
+                fig_cost, ax_cost = plt.subplots(figsize=(6, 5))
+                colors_list = [self.colors.get(p, 'gray') for p in cost_by_priority.index]
+                ax_cost.bar(cost_by_priority.index, cost_by_priority.values, color=colors_list, alpha=0.7)
+                ax_cost.set_xlabel('Priority Level')
+                ax_cost.set_ylabel('Total Cost ($)')
+                ax_cost.set_title('Cost by Priority')
+                ax_cost.tick_params(axis='x', rotation=45)
+                ax_cost.grid(True, alpha=0.3, axis='y')
+                plt.tight_layout()
+                st.pyplot(fig_cost)
+                plt.close(fig_cost)
             
             # Budget analysis
             st.subheader("Budget Planning")
@@ -432,42 +455,44 @@ class PoleDashboard:
                 ]
                 
                 # Multi-parameter trend chart
-                fig_trends = make_subplots(
-                    rows=2, cols=2,
-                    subplot_titles=['Moisture Content', 'pH Level', 'Electrical Conductivity', 'Bearing Capacity'],
-                    vertical_spacing=0.1
-                )
+                fig_trends, axes = plt.subplots(2, 2, figsize=(14, 10))
+                fig_trends.suptitle(f'Soil Conditions for Pole {selected_pole}', fontsize=16, fontweight='bold')
                 
                 if 'moisture_content' in pole_soil_data.columns:
-                    fig_trends.add_trace(
-                        go.Scatter(x=pole_soil_data['sample_date'], y=pole_soil_data['moisture_content'],
-                                 mode='lines+markers', name='Moisture'),
-                        row=1, col=1
-                    )
+                    axes[0, 0].plot(pole_soil_data['sample_date'], pole_soil_data['moisture_content'],
+                                   marker='o', linestyle='-', label='Moisture')
+                    axes[0, 0].set_title('Moisture Content')
+                    axes[0, 0].set_ylabel('Moisture (m³/m³)')
+                    axes[0, 0].grid(True, alpha=0.3)
+                    axes[0, 0].tick_params(axis='x', rotation=45)
                 
                 if 'ph' in pole_soil_data.columns:
-                    fig_trends.add_trace(
-                        go.Scatter(x=pole_soil_data['sample_date'], y=pole_soil_data['ph'],
-                                 mode='lines+markers', name='pH'),
-                        row=1, col=2
-                    )
+                    axes[0, 1].plot(pole_soil_data['sample_date'], pole_soil_data['ph'],
+                                   marker='s', linestyle='-', label='pH', color='orange')
+                    axes[0, 1].set_title('pH Level')
+                    axes[0, 1].set_ylabel('pH')
+                    axes[0, 1].grid(True, alpha=0.3)
+                    axes[0, 1].tick_params(axis='x', rotation=45)
                 
                 if 'electrical_conductivity' in pole_soil_data.columns:
-                    fig_trends.add_trace(
-                        go.Scatter(x=pole_soil_data['sample_date'], y=pole_soil_data['electrical_conductivity'],
-                                 mode='lines+markers', name='EC'),
-                        row=2, col=1
-                    )
+                    axes[1, 0].plot(pole_soil_data['sample_date'], pole_soil_data['electrical_conductivity'],
+                                   marker='^', linestyle='-', label='EC', color='green')
+                    axes[1, 0].set_title('Electrical Conductivity')
+                    axes[1, 0].set_ylabel('EC (dS/m)')
+                    axes[1, 0].grid(True, alpha=0.3)
+                    axes[1, 0].tick_params(axis='x', rotation=45)
                 
                 if 'bearing_capacity' in pole_soil_data.columns:
-                    fig_trends.add_trace(
-                        go.Scatter(x=pole_soil_data['sample_date'], y=pole_soil_data['bearing_capacity'],
-                                 mode='lines+markers', name='Bearing Capacity'),
-                        row=2, col=2
-                    )
+                    axes[1, 1].plot(pole_soil_data['sample_date'], pole_soil_data['bearing_capacity'],
+                                   marker='d', linestyle='-', label='Bearing Capacity', color='red')
+                    axes[1, 1].set_title('Bearing Capacity')
+                    axes[1, 1].set_ylabel('Bearing Capacity (kPa)')
+                    axes[1, 1].grid(True, alpha=0.3)
+                    axes[1, 1].tick_params(axis='x', rotation=45)
                 
-                fig_trends.update_layout(height=600, title_text=f"Soil Conditions for Pole {selected_pole}")
-                st.plotly_chart(fig_trends, use_container_width=True)
+                plt.tight_layout()
+                st.pyplot(fig_trends)
+                plt.close(fig_trends)
         
         # Correlation analysis
         st.subheader("Risk Factor Correlations")
@@ -475,13 +500,13 @@ class PoleDashboard:
         numeric_columns = st.session_state.filtered_df.select_dtypes(include=[np.number]).columns
         correlation_matrix = st.session_state.filtered_df[numeric_columns].corr()
         
-        fig_corr = px.imshow(
-            correlation_matrix,
-            title="Risk Factor Correlation Matrix",
-            color_continuous_scale='RdBu',
-            aspect='auto'
-        )
-        st.plotly_chart(fig_corr, use_container_width=True)
+        fig_corr, ax_corr = plt.subplots(figsize=(10, 8))
+        sns.heatmap(correlation_matrix, annot=True, fmt='.2f', cmap='RdBu_r', center=0,
+                   square=True, linewidths=0.5, cbar_kws={"shrink": 0.8}, ax=ax_corr)
+        ax_corr.set_title('Risk Factor Correlation Matrix')
+        plt.tight_layout()
+        st.pyplot(fig_corr)
+        plt.close(fig_corr)
         
         # Predictive insights
         st.subheader("Predictive Insights")
@@ -491,27 +516,43 @@ class PoleDashboard:
         with col1:
             # Health score prediction based on age
             if 'age_years' in st.session_state.filtered_df.columns:
-                fig_age_health = px.scatter(
-                    st.session_state.filtered_df,
-                    x='age_years',
-                    y='overall_health_score',
-                    color='maintenance_priority',
-                    title="Health vs Age Relationship",
-                    trendline="ols",
-                    color_discrete_map=self.colors
-                )
-                st.plotly_chart(fig_age_health, use_container_width=True)
+                fig_age_health, ax_age_health = plt.subplots(figsize=(8, 6))
+                for priority in st.session_state.filtered_df['maintenance_priority'].unique():
+                    data = st.session_state.filtered_df[
+                        st.session_state.filtered_df['maintenance_priority'] == priority
+                    ]
+                    ax_age_health.scatter(data['age_years'], data['overall_health_score'],
+                                        label=priority, color=self.colors.get(priority, 'gray'),
+                                        alpha=0.6, s=50)
+                # Add trend line
+                z = np.polyfit(st.session_state.filtered_df['age_years'].dropna(),
+                              st.session_state.filtered_df['overall_health_score'].dropna(), 1)
+                p = np.poly1d(z)
+                ax_age_health.plot(st.session_state.filtered_df['age_years'], 
+                                 p(st.session_state.filtered_df['age_years']), 
+                                 "r--", alpha=0.8, label='Trend')
+                ax_age_health.set_xlabel('Age (years)')
+                ax_age_health.set_ylabel('Health Score')
+                ax_age_health.set_title('Health vs Age Relationship')
+                ax_age_health.legend()
+                ax_age_health.grid(True, alpha=0.3)
+                plt.tight_layout()
+                st.pyplot(fig_age_health)
+                plt.close(fig_age_health)
         
         with col2:
             # Risk score distribution
             if 'composite_risk' in st.session_state.filtered_df.columns:
-                fig_risk_dist = px.histogram(
-                    st.session_state.filtered_df,
-                    x='composite_risk',
-                    title="Composite Risk Distribution",
-                    nbins=20
-                )
-                st.plotly_chart(fig_risk_dist, use_container_width=True)
+                fig_risk_dist, ax_risk_dist = plt.subplots(figsize=(8, 6))
+                ax_risk_dist.hist(st.session_state.filtered_df['composite_risk'], 
+                                 bins=20, alpha=0.7, color='orange', edgecolor='black')
+                ax_risk_dist.set_xlabel('Composite Risk Score')
+                ax_risk_dist.set_ylabel('Frequency')
+                ax_risk_dist.set_title('Composite Risk Distribution')
+                ax_risk_dist.grid(True, alpha=0.3, axis='y')
+                plt.tight_layout()
+                st.pyplot(fig_risk_dist)
+                plt.close(fig_risk_dist)
     
     def generate_pdf_report(self):
         """Generate PDF report (placeholder)."""

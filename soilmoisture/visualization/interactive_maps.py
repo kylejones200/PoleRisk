@@ -7,6 +7,10 @@ import pandas as pd
 from typing import Dict, List, Optional, Tuple, Union
 import logging
 from pathlib import Path
+import signalplot
+
+# Apply SignalPlot minimalist defaults
+signalplot.apply()
 
 try:
     import folium
@@ -16,12 +20,11 @@ except ImportError:
     FOLIUM_AVAILABLE = False
 
 try:
-    import plotly.express as px
-    import plotly.graph_objects as go
-    from plotly.subplots import make_subplots
-    PLOTLY_AVAILABLE = True
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+    MATPLOTLIB_AVAILABLE = True
 except ImportError:
-    PLOTLY_AVAILABLE = False
+    MATPLOTLIB_AVAILABLE = False
 
 try:
     import cartopy.crs as ccrs
@@ -301,20 +304,22 @@ class InteractiveMapGenerator:
         else:
             return '#008000'  # Green (wet)
     
-    def create_plotly_3d_surface(self, grid_data: pd.DataFrame,
-                                output_path: Optional[str] = None) -> str:
+    def create_3d_surface(self, grid_data: pd.DataFrame,
+                         output_path: Optional[str] = None) -> str:
         """
-        Create a 3D surface plot of soil moisture data using Plotly.
+        Create a 3D surface plot of soil moisture data using matplotlib.
         
         Args:
             grid_data: DataFrame with lat, lon, soil_moisture columns
-            output_path: Path to save HTML file
+            output_path: Path to save image file
             
         Returns:
-            Path to generated HTML file
+            Path to generated image file
         """
-        if not PLOTLY_AVAILABLE:
-            raise ImportError("Plotly is required for 3D visualizations")
+        try:
+            from mpl_toolkits.mplot3d import Axes3D
+        except ImportError:
+            raise ImportError("matplotlib 3D plotting is required for 3D visualizations")
         
         # Create grid for surface plot
         lats = np.sort(grid_data['lat'].unique())
@@ -331,41 +336,26 @@ class InteractiveMapGenerator:
                 lon_idx = np.argmin(np.abs(lons - row['lon']))
                 sm_grid[lat_idx, lon_idx] = row['soil_moisture']
         
-        # Create 3D surface plot
-        fig = go.Figure(data=[
-            go.Surface(
-                x=lon_grid,
-                y=lat_grid,
-                z=sm_grid,
-                colorscale='RdYlBu',
-                colorbar=dict(
-                    title="Soil Moisture (m³/m³)",
-                    titleside="right"
-                ),
-                hovertemplate='<b>Lat:</b> %{y:.4f}<br>' +
-                             '<b>Lon:</b> %{x:.4f}<br>' +
-                             '<b>Soil Moisture:</b> %{z:.3f}<extra></extra>'
-            )
-        ])
+        # Create 3D surface plot using matplotlib
+        fig = plt.figure(figsize=(12, 9))
+        ax = fig.add_subplot(111, projection='3d')
         
-        fig.update_layout(
-            title='3D Soil Moisture Surface',
-            scene=dict(
-                xaxis_title='Longitude',
-                yaxis_title='Latitude', 
-                zaxis_title='Soil Moisture (m³/m³)',
-                camera=dict(
-                    eye=dict(x=1.2, y=1.2, z=0.6)
-                )
-            ),
-            width=800,
-            height=600
-        )
+        surf = ax.plot_surface(lon_grid, lat_grid, sm_grid, cmap='RdYlBu', 
+                              alpha=0.8, linewidth=0, antialiased=True)
+        
+        ax.set_xlabel('Longitude')
+        ax.set_ylabel('Latitude')
+        ax.set_zlabel('Soil Moisture (m³/m³)')
+        ax.set_title('3D Soil Moisture Surface')
+        
+        # Add colorbar
+        fig.colorbar(surf, ax=ax, shrink=0.5, aspect=20, label='Soil Moisture (m³/m³)')
         
         if not output_path:
-            output_path = 'soil_moisture_3d_surface.html'
+            output_path = 'soil_moisture_3d_surface.png'
         
-        fig.write_html(output_path)
+        plt.savefig(output_path, dpi=150, bbox_inches='tight')
+        plt.close(fig)
         logger.info(f"3D surface plot saved to {output_path}")
         
         return output_path
@@ -564,10 +554,10 @@ def create_comprehensive_map_dashboard(data: pd.DataFrame,
                 logger.warning(f"Could not create heat map: {e}")
         
         # 3D surface plot
-        if len(data) > 20 and PLOTLY_AVAILABLE:
+        if len(data) > 20:
             try:
-                surface_path = Path(output_dir) / 'soil_moisture_3d_surface.html'
-                map_gen.create_plotly_3d_surface(data, str(surface_path))
+                surface_path = Path(output_dir) / 'soil_moisture_3d_surface.png'
+                map_gen.create_3d_surface(data, str(surface_path))
                 output_files.append(str(surface_path))
             except Exception as e:
                 logger.warning(f"Could not create 3D surface plot: {e}")

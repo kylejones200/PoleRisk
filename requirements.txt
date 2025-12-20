@@ -14,7 +14,7 @@ tensorflow>=2.8.0  # Optional, for neural networks
 jinja2>=3.0.0  # For HTML dashboard templates
 
 # Enhanced visualization
-plotly>=5.0.0  # For interactive plots
+signalplot>=0.1.2  # Minimalist plotting defaults for Matplotlib
 folium>=0.12.0  # For interactive maps
 
 # Web interface dependencies

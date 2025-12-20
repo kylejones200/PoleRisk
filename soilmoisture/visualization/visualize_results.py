@@ -8,6 +8,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 from matplotlib.dates import DateFormatter
+import signalplot
+
+# Apply SignalPlot minimalist defaults
+signalplot.apply()
 
 import logging
 logger = logging.getLogger(__name__)

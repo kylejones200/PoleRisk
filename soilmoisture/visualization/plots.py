@@ -16,6 +16,10 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy import stats
+import signalplot
+
+# Apply SignalPlot minimalist defaults
+signalplot.apply()
 
 logger = logging.getLogger(__name__)
 

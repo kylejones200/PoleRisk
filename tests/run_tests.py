@@ -1,14 +1,17 @@
 """
-Test runner script for the soil moisture package.
+Test runner script for the polerisk package.
 
 This script provides a convenient way to run different types of tests
 with various configurations and reporting options.
 """
 
 import argparse
+import logging
 import subprocess
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 
 def run_command(cmd, description):
@@ -34,7 +37,7 @@ def run_command(cmd, description):
 def main():
     """Main test runner function."""
     parser = argparse.ArgumentParser(
-        description="Run tests for the soil moisture package"
+        description="Run tests for the polerisk package"
     )
 
     parser.add_argument(
@@ -78,22 +81,22 @@ def main():
 
     # Run linting if requested
     if args.lint:
-        lint_cmd = ["flake8", "soilmoisture/", "--max-line-length=88"]
+        lint_cmd = ["flake8", "polerisk/", "--max-line-length=88"]
         success &= run_command(lint_cmd, "Code linting (flake8)")
 
-        isort_cmd = ["isort", "soilmoisture/", "--check-only", "--profile=black"]
+        isort_cmd = ["isort", "polerisk/", "--check-only", "--profile=black"]
         success &= run_command(isort_cmd, "Import sorting check (isort)")
 
     # Run formatting checks if requested
     if args.format:
-        black_cmd = ["black", "soilmoisture/", "--check", "--line-length=88"]
+        black_cmd = ["black", "polerisk/", "--check", "--line-length=88"]
         success &= run_command(black_cmd, "Code formatting check (black)")
 
     # Build test command
     test_cmd = ["python", "-m", "pytest"]
 
     # Add test directory
-    test_cmd.append("soilmoisture/tests/")
+    test_cmd.append("tests/")
 
     # Add test type markers
     if args.type == "unit":
@@ -119,7 +122,7 @@ def main():
     # Add coverage options
     if args.coverage:
         test_cmd.extend(
-            ["--cov=soilmoisture", "--cov-report=term-missing", "--cov-report=xml"]
+            ["--cov=polerisk", "--cov-report=term-missing", "--cov-report=xml"]
         )
 
         if args.html_report:

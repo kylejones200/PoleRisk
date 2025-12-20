@@ -68,17 +68,17 @@ jobs:
     
     - name: Lint with flake8
       run: |
-        flake8 soilmoisture --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 soilmoisture --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+        flake8 polerisk --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 polerisk --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
     
     - name: Type checking with mypy
       run: |
-        mypy soilmoisture --ignore-missing-imports
+        mypy polerisk --ignore-missing-imports
       continue-on-error: true  # Don't fail on type errors for now
     
     - name: Test with pytest
       run: |
-        pytest tests/ -v --cov=soilmoisture --cov-report=xml --cov-report=html
+        pytest tests/ -v --cov=polerisk --cov-report=xml --cov-report=html
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -104,7 +104,7 @@ jobs:
     
     - name: Run security checks with bandit
       run: |
-        bandit -r soilmoisture/ -f json -o bandit-report.json
+        bandit -r polerisk/ -f json -o bandit-report.json
       continue-on-error: true
     
     - name: Check dependencies with safety
@@ -168,8 +168,8 @@ jobs:
   #   
   #   - name: Build and test Docker image
   #     run: |
-  #       docker build -t soil-moisture-analyzer:test .
-  #       docker run --rm -d -p 5000:5000 --name test-container soil-moisture-analyzer:test
+  #       docker build -t polerisk:test .
+  #       docker run --rm -d -p 5000:5000 --name test-container polerisk:test
   #       sleep 30
   #       curl -f http://localhost:5000/health || exit 1
   #       docker stop test-container
@@ -177,8 +177,8 @@ jobs:
   #   - name: Push to Docker Hub
   #     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
   #     run: |
-  #       docker tag soil-moisture-analyzer:test ${{ secrets.DOCKER_USERNAME }}/soil-moisture-analyzer:latest
-  #       docker push ${{ secrets.DOCKER_USERNAME }}/soil-moisture-analyzer:latest
+  #       docker tag polerisk:test ${{ secrets.DOCKER_USERNAME }}/polerisk:latest
+  #       docker push ${{ secrets.DOCKER_USERNAME }}/polerisk:latest
 
   # deploy-docs:
   #   # Disabled: Using ReadTheDocs for documentation instead of GitHub Pages
@@ -240,8 +240,8 @@ jobs:
     
     - name: Create release artifacts
       run: |
-        tar -czf soil-moisture-analyzer-${{ github.event.release.tag_name }}.tar.gz \
-          soilmoisture/ docs/ requirements*.txt *.py *.md LICENSE
+        tar -czf polerisk-${{ github.event.release.tag_name }}.tar.gz \
+          polerisk/ docs/ requirements*.txt *.py *.md LICENSE
     
     - name: Upload release assets
       uses: actions/upload-release-asset@v1
@@ -249,6 +249,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./soil-moisture-analyzer-${{ github.event.release.tag_name }}.tar.gz
-        asset_name: soil-moisture-analyzer-${{ github.event.release.tag_name }}.tar.gz
+        asset_path: ./polerisk-${{ github.event.release.tag_name }}.tar.gz
+        asset_name: polerisk-${{ github.event.release.tag_name }}.tar.gz
         asset_content_type: application/gzip

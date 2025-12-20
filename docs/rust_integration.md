@@ -1,6 +1,6 @@
 # Rust Integration Guide
 
-This guide provides information about the Rust-optimized functions in the soilmoisture package, including installation, usage, and troubleshooting.
+This guide provides information about the Rust-optimized functions in the PoleRisk package, including installation, usage, and troubleshooting.
 
 ## Table of Contents
 - [Overview](#overview)
