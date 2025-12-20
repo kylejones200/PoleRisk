@@ -14,14 +14,14 @@ from datetime import datetime
 sys.path.insert(0, os.path.abspath('../../'))
 
 # Project information
-project = 'Soil Moisture Analyzer'
-copyright = f'{datetime.now().year}, Your Name'
-author = 'Your Name'
+project = 'PoleRisk'
+copyright = f'{datetime.now().year}, Kyle T. Jones'
+author = 'Kyle T. Jones'
 
 # The short X.Y version
-version = '1.0'
+version = '1.1'
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '1.1.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

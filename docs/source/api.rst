@@ -3,7 +3,7 @@
 API Reference
 ============
 
-This page provides detailed documentation for the Soil Moisture Analyzer API.
+This page provides detailed documentation for the PoleRisk API.
 
 Core Modules
 -----------
@@ -11,17 +11,25 @@ Core Modules
 .. toctree::
    :maxdepth: 2
 
-   modules/soilmoisture
+   modules/polerisk
 
-.. automodule:: soilmoisture
+.. automodule:: polerisk
    :members:
    :undoc-members:
    :show-inheritance:
 
-Data Processing
----------------
+Pole Health Assessment
+---------------------
 
-.. automodule:: soilmoisture.data
+.. automodule:: polerisk.pole_health.assessment
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Risk Scoring
+------------
+
+.. automodule:: polerisk.pole_health.risk_scoring
    :members:
    :undoc-members:
    :show-inheritance:
@@ -29,20 +37,15 @@ Data Processing
 Visualization
 -------------
 
-.. automodule:: soilmoisture.visualization
+.. automodule:: polerisk.visualization
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: soilmoisture.visualization.plots
-   :members:
-   :undoc-members:
-   :show-inheritance:
+Database
+--------
 
-Utilities
----------
-
-.. automodule:: soilmoisture.utils
+.. automodule:: polerisk.database
    :members:
    :undoc-members:
    :show-inheritance:

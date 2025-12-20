@@ -3,7 +3,7 @@
 Usage Guide
 ==========
 
-This guide provides an overview of how to use the Soil Moisture Analyzer package.
+This guide provides an overview of how to use the PoleRisk package for utility pole health assessment and maintenance optimization.
 
 Basic Usage
 -----------
@@ -12,56 +12,38 @@ Basic Usage
 
    .. code-block:: python
 
-      import soilmoisture
-      from soilmoisture.data import load_data
-      from soilmoisture.visualization import plot_time_series
+      import polerisk
+      from polerisk.pole_health import PoleHealthAssessment
+      from polerisk.pole_health.risk_scoring import PoleRiskScorer
 
-2. **Load your data**:
-
-   .. code-block:: python
-
-      # Load in-situ and satellite data
-      data = load_data(
-          in_situ_path='path/to/insitu_data.csv',
-          satellite_path='path/to/satellite_data.nc'
-      )
-
-3. **Process the data**:
+2. **Load your pole data**:
 
    .. code-block:: python
 
-      # Process and match the data
-      matched_data = soilmoisture.match_data(data)
+      # Load pole inventory data
+      import pandas as pd
+      poles_df = pd.read_csv('pole_inventory.csv')
 
-4. **Visualize the results**:
+3. **Assess pole health**:
 
    .. code-block:: python
 
-      # Create a time series plot
-      fig = plot_time_series(
-          matched_data,
-          x='date',
-          y=['in_situ', 'satellite'],
-          title='Soil Moisture Time Series'
-      )
-      fig.savefig('soil_moisture_plot.png')
+      # Create assessment instance
+      assessor = PoleHealthAssessment()
+      
+      # Assess all poles
+      assessment_results = assessor.assess_poles(poles_df)
 
-Command Line Interface
----------------------
+4. **Calculate risk scores**:
 
-The package provides command-line tools for common tasks:
+   .. code-block:: python
 
-1. **Process data**:
-
-   .. code-block:: bash
-
-      soilmoisture-analyze --input input_data.nc --output results.csv
-
-2. **Generate visualizations**:
-
-   .. code-block:: bash
-
-      soilmoisture-visualize --input results.csv --output-dir plots/
+      # Calculate risk scores
+      risk_scorer = PoleRiskScorer()
+      risk_scores = risk_scorer.calculate_risk(assessment_results)
+      
+      # Identify high-risk poles
+      high_risk_poles = risk_scores[risk_scores['risk_score'] > 0.7]
 
 Example Workflow
 ----------------
@@ -70,82 +52,36 @@ Here's a complete example workflow:
 
 .. code-block:: python
 
-   import os
    import pandas as pd
-   import soilmoisture
-   from soilmoisture.data import load_data, process_data
-   from soilmoisture.visualization import (
-       plot_time_series,
-       plot_scatter,
-       plot_distributions,
-       create_dashboard
+   from polerisk.pole_health import PoleHealthAssessment
+   from polerisk.pole_health.risk_scoring import PoleRiskScorer, MaintenanceScheduler
+
+   # Load pole data
+   poles_df = pd.read_csv('Input/sample_poles.csv')
+   soil_df = pd.read_csv('Input/sample_soil_data.csv')
+
+   # Assess pole health
+   assessor = PoleHealthAssessment()
+   assessment = assessor.assess_poles(poles_df, soil_data=soil_df)
+
+   # Calculate risk scores
+   risk_scorer = PoleRiskScorer()
+   risk_assessment = risk_scorer.calculate_risk(assessment)
+
+   # Generate maintenance schedule
+   scheduler = MaintenanceScheduler()
+   maintenance_schedule = scheduler.optimize_schedule(
+       risk_assessment,
+       budget=100000,
+       time_horizon_days=365
    )
-
-   # Set up paths
-   input_dir = 'Input'
-   output_dir = 'Output'
-   os.makedirs(output_dir, exist_ok=True)
-
-   # Load and process data
-   data = load_data(
-       in_situ_path=os.path.join(input_dir, 'In-situ data/insitu_measurements.csv'),
-       satellite_path=os.path.join(input_dir, 'LPRM_NetCDF/satellite_data.nc')
-   )
-
-   # Process and match the data
-   matched_data = soilmoisture.match_data(data)
 
    # Save results
-   output_file = os.path.join(output_dir, 'matched_results.csv')
-   matched_data.to_csv(output_file, index=False)
+   assessment.to_csv('Output/pole_health_assessment.csv', index=False)
+   maintenance_schedule.to_csv('Output/maintenance_schedule.csv', index=False)
 
-   # Generate visualizations
-   plot_time_series(
-       matched_data,
-       output_dir=output_dir,
-       title='Soil Moisture Time Series'
-   )
-
-   plot_scatter(
-       matched_data,
-       output_dir=output_dir,
-       x='in_situ',
-       y='satellite',
-       title='In-situ vs Satellite Soil Moisture'
-   )
-
-   # Create an interactive dashboard
-   dashboard_path = create_dashboard(matched_data, output_dir=output_dir)
-   print(f"Dashboard created at: {dashboard_path}")
-
-Configuration
--------------
-
-You can configure the package using a configuration file (``config.ini``):
-
-.. code-block:: ini
-
-   [paths]
-   input_dir = Input
-   output_dir = Output
-   
-   [processing]
-   time_zone = America/New_York
-   resample_freq = 1D
-   
-   [visualization]
-   style = seaborn
-   figsize = 12, 8
-   dpi = 300
-
-Then load the configuration in your code:
-
-.. code-block:: python
-
-   from soilmoisture.config import load_config
-   
-   config = load_config('config.ini')
-   print(f"Input directory: {config['paths']['input_dir']}")
+   print(f"Assessed {len(assessment)} poles")
+   print(f"High-risk poles: {len(risk_assessment[risk_assessment['risk_score'] > 0.7])}")
 
 Troubleshooting
 ---------------
@@ -164,4 +100,4 @@ Common issues and solutions:
    - For large datasets, consider downsampling or using a subset of the data
    - Close other memory-intensive applications
 
-For additional help, please refer to the :ref:`api` documentation or open an issue on our `GitHub repository <https://github.com/yourusername/soil-moisture-analyzer/issues>`_.
+For additional help, please refer to the :ref:`api` documentation or open an issue on our `GitHub repository <https://github.com/kylejones200/polerisk/issues>`_.
