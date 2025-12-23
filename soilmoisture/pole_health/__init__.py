@@ -14,6 +14,14 @@ from .failure_modes import (
     FailureModeAnalysis,
     FailureModeModel,
 )
+from .inspection_realism import (
+    InspectionMethod,
+    InspectorProfile,
+    DefectType,
+    Defect,
+    InspectionResult,
+    InspectionRealismModel,
+)
 
 __all__ = [
     'PoleHealthAssessment',
@@ -26,4 +34,10 @@ __all__ = [
     'FailureModeRisk',
     'FailureModeAnalysis',
     'FailureModeModel',
+    'InspectionMethod',
+    'InspectorProfile',
+    'DefectType',
+    'Defect',
+    'InspectionResult',
+    'InspectionRealismModel',
 ]
