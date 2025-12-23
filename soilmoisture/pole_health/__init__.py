@@ -8,6 +8,12 @@ based on soil conditions, pole characteristics, and environmental factors.
 from .assessment import PoleHealthAssessment, SoilConditionAnalyzer
 from .risk_scoring import PoleRiskScorer, MaintenanceScheduler
 from .pole_data import PoleInfo, SoilSample
+from .failure_modes import (
+    FailureMode,
+    FailureModeRisk,
+    FailureModeAnalysis,
+    FailureModeModel,
+)
 
 __all__ = [
     'PoleHealthAssessment',
@@ -15,5 +21,9 @@ __all__ = [
     'PoleRiskScorer',
     'MaintenanceScheduler',
     'PoleInfo',
-    'SoilSample'
+    'SoilSample',
+    'FailureMode',
+    'FailureModeRisk',
+    'FailureModeAnalysis',
+    'FailureModeModel',
 ]

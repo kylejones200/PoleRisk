@@ -25,12 +25,12 @@ def run_command(cmd, description):
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         logger.debug(result.stdout)
         if result.stderr:
-            logger.debug("STDERR:", result.stderr)
+            logger.debug(f"STDERR: {result.stderr}")
         return True
     except subprocess.CalledProcessError as e:
         logger.error(f"ERROR: {description} failed with exit code {e.returncode}")
-        logger.debug("STDOUT:", e.stdout)
-        logger.debug("STDERR:", e.stderr)
+        logger.debug(f"STDOUT: {e.stdout}")
+        logger.debug(f"STDERR: {e.stderr}")
         return False
 
 

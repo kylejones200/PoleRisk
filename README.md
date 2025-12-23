@@ -1,6 +1,6 @@
 # polerisk
 
-**Predictive utility pole failure analysis and maintenance optimization platform**
+Predictive utility pole failure analysis and maintenance optimization platform
 
 ## What You Get
 
@@ -8,25 +8,25 @@
 
 ### Key Capabilities
 
-**Risk Assessment**
+Risk Assessment
 - Analyze pole condition and failure probability
 - Multi-factor risk scoring (age, material, weather exposure, load)
 - Historical failure pattern analysis
 - Predictive maintenance scheduling
 
-**Data-Driven Insights**
+Data-Driven Insights
 - Statistical analysis of pole populations
 - Geospatial visualization of risk hotspots
 - Time series analysis for degradation patterns
 - Cost-benefit analysis for maintenance prioritization
 
-**Machine Learning Models**
+Machine Learning Models
 - Failure prediction models
 - Anomaly detection for unusual deterioration
 - Risk clustering and pattern recognition
 - Custom model training on your data
 
-**Reporting & Visualization**
+Reporting & Visualization
 - Interactive dashboards
 - Exportable reports (PDF, CSV, HTML)
 - Map-based visualizations
@@ -162,13 +162,13 @@ roi = polerisk.calculate_roi(
 
 `polerisk` works with standard pole inventory data:
 
-**Minimum Required Fields:**
+Minimum Required Fields:
 - Pole ID
 - Location (latitude/longitude or address)
 - Installation date or age
 - Material type
 
-**Recommended Fields for Better Analysis:**
+Recommended Fields for Better Analysis:
 - Inspection history
 - Maintenance records
 - Load data
@@ -176,7 +176,7 @@ roi = polerisk.calculate_roi(
 - Soil conditions
 - Previous failures
 
-**Supported Data Formats:**
+Supported Data Formats:
 - CSV, Excel
 - JSON, GeoJSON
 - Shapefiles
@@ -205,17 +205,17 @@ roi = polerisk.calculate_roi(
 
 ## Performance
 
-- Analyze **100,000+ poles** in seconds
+- Analyze 100,000+ poles in seconds
 - Real-time risk scoring
 - Parallel processing for large datasets
 - Cloud-scalable architecture
 
 ## Support
 
-- **Documentation**: [polerisk.readthedocs.io](https://polerisk.readthedocs.io/)
-- **Issues**: [github.com/kylejones200/polerisk/issues](https://github.com/kylejones200/polerisk/issues)
-- **Discussions**: [github.com/kylejones200/polerisk/discussions](https://github.com/kylejones200/polerisk/discussions)
-- **Contact**: kyletjones@gmail.com
+- Documentation: [polerisk.readthedocs.io](https://polerisk.readthedocs.io/)
+- Issues: [github.com/kylejones200/polerisk/issues](https://github.com/kylejones200/polerisk/issues)
+- Discussions: [github.com/kylejones200/polerisk/discussions](https://github.com/kylejones200/polerisk/discussions)
+- Contact: kyletjones@gmail.com
 
 ## Requirements
 
@@ -228,7 +228,7 @@ MIT License - Free for commercial and personal use.
 
 ---
 
-**Ready to optimize your pole maintenance?**
+Ready to optimize your pole maintenance?
 
 ```bash
 pip install polerisk
