@@ -22,6 +22,13 @@ from .inspection_realism import (
     InspectionResult,
     InspectionRealismModel,
 )
+from .survival_analysis import (
+    PoleClass,
+    EnvironmentType,
+    SurvivalCurve,
+    RemainingUsefulLife,
+    SurvivalAnalysisModel,
+)
 
 __all__ = [
     'PoleHealthAssessment',
@@ -40,4 +47,9 @@ __all__ = [
     'Defect',
     'InspectionResult',
     'InspectionRealismModel',
+    'PoleClass',
+    'EnvironmentType',
+    'SurvivalCurve',
+    'RemainingUsefulLife',
+    'SurvivalAnalysisModel',
 ]
