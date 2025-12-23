@@ -383,9 +383,7 @@ def main():
         logger.debug("  • Can switch to PostgreSQL for production")
         
     except Exception as e:
-        logger.error(f"Migration failed: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.exception("Migration failed")
 
 
 if __name__ == "__main__":

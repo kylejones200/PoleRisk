@@ -134,9 +134,7 @@ Examples:
         )
         
     except Exception as e:
-        logger.error(f"Error during visualization generation: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.exception("Error during visualization generation")
 
 
 if __name__ == "__main__":

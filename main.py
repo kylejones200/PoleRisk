@@ -309,9 +309,7 @@ Examples:
         logger.info(f"  - maintenance_report.txt: Executive summary")
         
     except Exception as e:
-        logger.error(f"Error during assessment: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.exception("Error during assessment")
 
 
 if __name__ == "__main__":

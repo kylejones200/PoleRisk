@@ -254,10 +254,7 @@ def main():
         logger.debug("  3. Weather data will automatically enhance pole assessments")
 
     except Exception as e:
-        logger.error(f" Error during weather testing: {e}")
-        import traceback
-
-        traceback.print_exc()
+        logger.exception("Error during weather testing")
 
 
 if __name__ == "__main__":

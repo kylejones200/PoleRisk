@@ -238,10 +238,7 @@ def main():
         logger.debug("\nNext: Integrate with main assessment system")
 
     except Exception as e:
-        logger.error(f" Error during testing: {e}")
-        import traceback
-
-        traceback.print_exc()
+        logger.exception("Error during testing")
 
 
 if __name__ == "__main__":
