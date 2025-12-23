@@ -1,5 +1,6 @@
 """
-polerisk - Predictive utility pole failure analysis and maintenance optimization platform
+polerisk - Predictive utility pole failure analysis and maintenance
+optimization platform
 """
 
 __version__ = "1.0.0"
