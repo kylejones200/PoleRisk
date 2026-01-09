@@ -1,12 +1,12 @@
 """
 Test script to verify the integration of Rust-optimized statistical functions
-in the soilmoisture package.
+in the polerisk package.
 """
 
 import numpy as np
 import logging
 
-from soilmoisture.analysis import (
+from polerisk.analysis import (
     calculate_rmse,
     calculate_correlation,
     calculate_mae,

@@ -13,7 +13,7 @@ import logging
 # Add project root to path
 sys.path.append("/Users/k.jones/Documents/moisture")
 
-from soilmoisture.weather import (
+from polerisk.weather import (
     OpenWeatherMapProvider,
     WeatherRiskAssessment,
     WeatherConditions,

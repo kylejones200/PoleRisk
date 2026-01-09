@@ -8,4 +8,4 @@
 numba>=0.56.0  # JIT compilation for 2-50x speedup on geospatial operations
 
 # Optional: For maximum performance, also build Rust extensions
-# cd soilmoisture_rs && maturin develop --release
+# cd polerisk_rs && maturin develop --release

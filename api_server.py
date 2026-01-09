@@ -13,10 +13,10 @@ import pandas as pd
 import io
 
 # Import database models and data access
-from soilmoisture.database import DatabaseManager, PoleDataAccess
-from soilmoisture.pole_health.assessment import PoleHealthAssessment
-from soilmoisture.pole_health.structural_assessment import EnhancedPoleHealthAssessment
-from soilmoisture.weather import OpenWeatherMapProvider, WeatherRiskAssessment
+from polerisk.database import DatabaseManager, PoleDataAccess
+from polerisk.pole_health.assessment import PoleHealthAssessment
+from polerisk.pole_health.structural_assessment import EnhancedPoleHealthAssessment
+from polerisk.weather import OpenWeatherMapProvider, WeatherRiskAssessment
 
 logger = logging.getLogger(__name__)
 
@@ -301,7 +301,7 @@ async def assess_pole_health(pole_id: str, db: PoleDataAccess = Depends(get_data
         inspections = db.get_inspections(pole_id)
         
         # Convert database models to our assessment models
-        from soilmoisture.pole_health.pole_data import PoleInfo, SoilSample
+        from polerisk.pole_health.pole_data import PoleInfo, SoilSample
         
         pole_info = PoleInfo(
             pole_id=pole.pole_id,
@@ -446,7 +446,7 @@ async def assess_all_poles(db: PoleDataAccess = Depends(get_database)):
                     continue
                 
                 # Convert to assessment objects
-                from soilmoisture.pole_health.pole_data import PoleInfo, SoilSample
+                from polerisk.pole_health.pole_data import PoleInfo, SoilSample
                 
                 pole_info = PoleInfo(
                     pole_id=pole.pole_id,

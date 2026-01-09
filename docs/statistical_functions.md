@@ -1,6 +1,6 @@
 # Statistical Functions Reference
 
-This document provides detailed documentation for the statistical functions available in the soilmoisture package. These functions are optimized with Rust for better performance and include fallback Python implementations.
+This document provides detailed documentation for the statistical functions available in the polerisk package. These functions are optimized with Rust for better performance and include fallback Python implementations.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -16,7 +16,7 @@ This document provides detailed documentation for the statistical functions avai
 
 ## Overview
 
-The soilmoisture package provides several statistical functions for analyzing and comparing soil moisture data. These functions are:
+The polerisk package provides several statistical functions for analyzing and comparing soil moisture data. These functions are:
 
 1. **RMSE (Root Mean Square Error)**: Measures the average magnitude of the errors between predicted and observed values.
 2. **MAE (Mean Absolute Error)**: Measures the average absolute difference between predicted and observed values.
@@ -147,7 +147,7 @@ ubrmse = calculate_ubrmse(x, y)  # Very small (just random error)
 
 ```python
 import numpy as np
-from soilmoisture.analysis import (
+from polerisk.analysis import (
     calculate_rmse,
     calculate_mae,
     calculate_correlation,

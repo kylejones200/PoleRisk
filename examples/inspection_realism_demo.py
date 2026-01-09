@@ -15,7 +15,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from soilmoisture.pole_health.inspection_realism import (
+from polerisk.pole_health.inspection_realism import (
     InspectionRealismModel,
     InspectorProfile,
     InspectionMethod,

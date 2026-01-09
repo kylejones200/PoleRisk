@@ -1,7 +1,7 @@
 """Tests for utc2local module."""
 
 import pytest
-from soilmoisture.core.utc2local import utc2local
+from polerisk.core.utc2local import utc2local
 
 
 def test_utc2local_positive_longitude():

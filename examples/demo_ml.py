@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 # Import our new ML modules
-from soilmoisture.ml.models import SoilMoisturePredictor, AnomalyDetector, TimeSeriesForecaster
-from soilmoisture.ml.features import FeatureEngineer, create_temporal_features, select_features
-from soilmoisture.analysis.statistics import calculate_rmse, calculate_correlation, calculate_bias
+from polerisk.ml.models import SoilMoisturePredictor, AnomalyDetector, TimeSeriesForecaster
+from polerisk.ml.features import FeatureEngineer, create_temporal_features, select_features
+from polerisk.analysis.statistics import calculate_rmse, calculate_correlation, calculate_bias
 
 
 def create_demo_data():
@@ -374,7 +374,7 @@ def main():
     
     logger.info("\n Demo completed successfully!")
     logger.debug("\nNext steps:")
-    logger.debug("1. Try the CLI interface: python -m soilmoisture.ml.cli train --data-file ML_Demo_Output/demo_data.csv")
+    logger.debug("1. Try the CLI interface: python -m polerisk.ml.cli train --data-file ML_Demo_Output/demo_data.csv")
     logger.debug("2. Experiment with different model types and parameters")
     logger.debug("3. Use real soil moisture data for production models")
 

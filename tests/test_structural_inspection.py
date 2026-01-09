@@ -14,13 +14,13 @@ import logging
 # Add the project root to Python path
 sys.path.append("/Users/k.jones/Documents/moisture")
 
-from soilmoisture.pole_health.enhanced_models import (
+from polerisk.pole_health.enhanced_models import (
     StructuralInspection,
     InspectionType,
     PoleCondition,
     EnhancedPoleInfo,
 )
-from soilmoisture.pole_health.structural_assessment import (
+from polerisk.pole_health.structural_assessment import (
     StructuralConditionAnalyzer,
     EnhancedPoleHealthAssessment,
 )

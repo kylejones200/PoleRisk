@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from pathlib import Path
 
-import soilmoisture.core.matching as matching
+import polerisk.core.matching as matching
 
 
 def test_get_morning_measurements_basic():
@@ -69,12 +69,12 @@ def test_match_insitu_with_lprm_end_to_end(tmp_path, monkeypatch):
     monkeypatch.setattr(matching, "utc2local", lambda lon, d, t: (d, t))
 
     # Monkeypatch get_lprm_des used via local import in function
-    # match_insitu_with_lprm does: from . import get_lprm_des (i.e., soilmoisture.core.get_lprm_des)
+    # match_insitu_with_lprm does: from . import get_lprm_des (i.e., polerisk.core.get_lprm_des)
     def fake_get_lprm_des(date, lat, lon, lat_grid, lon_grid):
         # return distinct values per date to assert mapping
         return {"20200101": 1.0, "20200102": 2.0}.get(date, np.nan)
 
-    import soilmoisture.core as core_pkg
+    import polerisk.core as core_pkg
 
     monkeypatch.setattr(core_pkg, "get_lprm_des", fake_get_lprm_des)
 

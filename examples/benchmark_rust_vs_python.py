@@ -4,7 +4,7 @@ Performance benchmarking of Rust-optimized statistical functions vs Python imple
 import timeit
 import numpy as np
 import matplotlib.pyplot as plt
-from soilmoisture.analysis import (
+from polerisk.analysis import (
     calculate_rmse,
     calculate_correlation,
     calculate_mae,

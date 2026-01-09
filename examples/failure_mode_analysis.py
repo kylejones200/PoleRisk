@@ -12,12 +12,12 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from soilmoisture.pole_health import (
+from polerisk.pole_health import (
     PoleInfo,
     FailureModeModel,
     FailureModeAnalysis,
 )
-from soilmoisture.pole_health.pole_data import PoleHealthMetrics
+from polerisk.pole_health.pole_data import PoleHealthMetrics
 from datetime import datetime
 
 

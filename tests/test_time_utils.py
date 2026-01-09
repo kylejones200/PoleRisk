@@ -1,7 +1,7 @@
 """Tests for time_utils module."""
 
 import pytest
-from soilmoisture.utils.time_utils import utc2local
+from polerisk.utils.time_utils import utc2local
 
 
 def test_utc2local_positive_longitude():

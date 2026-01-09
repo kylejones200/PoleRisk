@@ -17,6 +17,9 @@ jinja2>=3.0.0  # For HTML dashboard templates
 signalplot>=0.1.2  # Minimalist plotting defaults for Matplotlib
 folium>=0.12.0  # For interactive maps
 
+# Time series to network analysis
+ts2net>=0.7.0  # Time series to network conversion for pattern analysis
+
 # Web interface dependencies
 flask>=2.0.0
 flask-cors>=3.0.0

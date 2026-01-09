@@ -1,5 +1,5 @@
 """
-Comprehensive test suite for statistical functions in soilmoisture.analysis.statistics.
+Comprehensive test suite for statistical functions in polerisk.analysis.statistics.
 
 This module includes unit tests, edge case tests, and property-based tests for
 all statistical functions, ensuring both Python and Rust implementations behave
@@ -9,7 +9,7 @@ the same way.
 import pytest
 import numpy as np
 from hypothesis import given, strategies as st, assume
-from soilmoisture.analysis.statistics import (
+from polerisk.analysis.statistics import (
     calculate_rmse,
     calculate_correlation,
     calculate_mae,
@@ -194,11 +194,11 @@ if RUST_AVAILABLE:
             rust_result = calculate_rmse(x, y)
 
             # Get Python result by temporarily disabling Rust
-            from soilmoisture.analysis.statistics import RUST_AVAILABLE
+            from polerisk.analysis.statistics import RUST_AVAILABLE
 
             original_rust_available = RUST_AVAILABLE
             try:
-                import soilmoisture.analysis.statistics as stats
+                import polerisk.analysis.statistics as stats
 
                 stats.RUST_AVAILABLE = False
                 python_result = stats.calculate_rmse(x, y)

@@ -68,7 +68,7 @@ def benchmark_pixel_search():
         
         # Benchmark Numba version
         try:
-            from soilmoisture.acceleration import find_nearest_valid_pixel_numba, NUMBA_AVAILABLE
+            from polerisk.acceleration import find_nearest_valid_pixel_numba, NUMBA_AVAILABLE
             
             if NUMBA_AVAILABLE:
                 # Warm up JIT compilation
@@ -143,7 +143,7 @@ def benchmark_coordinate_matching():
         
         # Benchmark Numba
         try:
-            from soilmoisture.acceleration import find_nearest_grid_point_numba, NUMBA_AVAILABLE
+            from polerisk.acceleration import find_nearest_grid_point_numba, NUMBA_AVAILABLE
             
             if NUMBA_AVAILABLE:
                 # Warm up
@@ -231,7 +231,7 @@ def benchmark_statistical_analysis():
         
         # Benchmark Numba
         try:
-            from soilmoisture.acceleration import batch_statistical_analysis_numba, NUMBA_AVAILABLE
+            from polerisk.acceleration import batch_statistical_analysis_numba, NUMBA_AVAILABLE
             
             if NUMBA_AVAILABLE:
                 # Warm up

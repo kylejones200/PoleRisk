@@ -2,7 +2,7 @@
 
 import numpy as np
 import pytest
-from soilmoisture.core.getlocation import get_location
+from polerisk.core.getlocation import get_location
 
 
 def test_get_location_simple():

@@ -11,7 +11,7 @@ import pandas as pd
 import logging
 from pathlib import Path
 
-from soilmoisture.visualization.pole_health_viz import PoleHealthVisualizer
+from polerisk.visualization.pole_health_viz import PoleHealthVisualizer
 
 # Configure logging
 logging.basicConfig(

@@ -2,7 +2,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import soilmoisture.core.getlprm_des as mod
+import polerisk.core.getlprm_des as mod
 
 
 class FakeNCVar:
@@ -26,7 +26,7 @@ class FakeDS:
 
 def _install_fake_getpara(monkeypatch, lat, lon, files):
     # Mock ConfigManager.get_parameters instead of the old getpara module
-    from soilmoisture.common.config import ConfigManager
+    from polerisk.common.config import ConfigManager
 
     def fake_get_parameters(force_refresh=False):
         return {

@@ -14,10 +14,10 @@ import pandas as pd
 from datetime import datetime
 from pathlib import Path
 
-from soilmoisture.pole_health.pole_data import PoleInfo, SoilSample, PoleDatabase
-from soilmoisture.pole_health.assessment import PoleHealthAssessment
-from soilmoisture.pole_health.risk_scoring import PoleRiskScorer, MaintenanceScheduler
-from soilmoisture.common import DataLoader
+from polerisk.pole_health.pole_data import PoleInfo, SoilSample, PoleDatabase
+from polerisk.pole_health.assessment import PoleHealthAssessment
+from polerisk.pole_health.risk_scoring import PoleRiskScorer, MaintenanceScheduler
+from polerisk.common import DataLoader
 
 # Configure logging
 logging.basicConfig(

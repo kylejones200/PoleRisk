@@ -2,7 +2,7 @@ import numpy as np
 import numpy.ma as ma
 import pytest
 
-import soilmoisture.core.lprm_utils as lu
+import polerisk.core.lprm_utils as lu
 
 
 class FakeNCVar:

@@ -13,7 +13,7 @@ import logging
 # Add project root to path
 sys.path.append('/Users/k.jones/Documents/moisture')
 
-from soilmoisture.database.models import (
+from polerisk.database.models import (
     DatabaseManager, PoleDataAccess, Pole, SoilSample, 
     StructuralInspection, HealthAssessment, WeatherData
 )

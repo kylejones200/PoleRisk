@@ -13,7 +13,7 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 try:
-    from soilmoisture.web.app import create_app
+    from polerisk.web.app import create_app
 except ImportError as e:
     logger.error(f"Error importing web application: {e}")
     logger.debug("Please ensure you have installed the required dependencies:")

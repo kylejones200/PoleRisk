@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-import soilmoisture.core.parameters as params_mod
+import polerisk.core.parameters as params_mod
 
 
 class FakeDataset:

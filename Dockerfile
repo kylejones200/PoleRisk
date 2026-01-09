@@ -1,4 +1,4 @@
-# Multi-stage build for Soil Moisture Analyzer
+# Multi-stage build for polerisk platform
 FROM python:3.10-slim as builder
 
 # Install system dependencies
@@ -20,14 +20,14 @@ WORKDIR /app
 
 # Copy dependency files
 COPY requirements.txt pyproject.toml setup.py ./
-COPY soilmoisture_rs/ ./soilmoisture_rs/
+COPY polerisk_rs/ ./polerisk_rs/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Build Rust extensions
-WORKDIR /app/soilmoisture_rs
+WORKDIR /app/polerisk_rs
 RUN pip install maturin
 RUN maturin build --release
 RUN pip install target/wheels/*.whl
@@ -45,7 +45,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
-RUN groupadd -r soilmoisture && useradd -r -g soilmoisture soilmoisture
+RUN groupadd -r polerisk && useradd -r -g polerisk polerisk
 
 # Set work directory
 WORKDIR /app
@@ -55,13 +55,13 @@ COPY --from=builder /usr/local/lib/python3.10/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code
-COPY soilmoisture/ ./soilmoisture/
+COPY polerisk/ ./polerisk/
 COPY *.py ./
 COPY README*.md ./
 
 # Create necessary directories
 RUN mkdir -p data output uploads logs && \
-    chown -R soilmoisture:soilmoisture /app
+    chown -R polerisk:polerisk /app
 
 # Switch to non-root user
 USER soilmoisture

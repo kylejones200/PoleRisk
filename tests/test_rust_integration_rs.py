@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 try:
-    import soilmoisture_rs as rust  # This may import the directory, not the compiled module
+    import polerisk_rs as rust  # This may import the directory, not the compiled module
 
     REQUIRED_FUNCS = [
         "calculate_mae_rs",
@@ -19,12 +19,12 @@ try:
     if not all(hasattr(rust, name) for name in REQUIRED_FUNCS):
         pytest.skip(
             "Rust extension not built/loaded (module exists but missing expected functions).\n"
-            "Build with: cd soilmoisture_rs && maturin develop --release",
+            "Build with: cd polerisk_rs && maturin develop --release",
             allow_module_level=True,
         )
 except Exception:
     pytest.skip(
-        "Rust extension not importable. Build with: cd soilmoisture_rs && maturin develop --release",
+        "Rust extension not importable. Build with: cd polerisk_rs && maturin develop --release",
         allow_module_level=True,
     )
 

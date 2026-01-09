@@ -4,7 +4,7 @@ import pytest
 
 # Try to import Rust extensions, skip tests if not available
 try:
-    from soilmoisture_rs import (
+    from polerisk_rs import (
         calculate_rmse_rs,
         calculate_correlation_rs,
         calculate_mae_rs,

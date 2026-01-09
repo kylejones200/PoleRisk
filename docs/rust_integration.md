@@ -12,7 +12,7 @@ This guide provides information about the Rust-optimized functions in the PoleRi
 
 ## Overview
 
-The soilmoisture package includes performance-critical functions implemented in Rust for better performance. These functions are automatically used when available, with fallbacks to pure Python implementations.
+The polerisk package includes performance-critical functions implemented in Rust for better performance. These functions are automatically used when available, with fallbacks to pure Python implementations.
 
 ## Installation
 
@@ -36,13 +36,13 @@ The soilmoisture package includes performance-critical functions implemented in 
 
 3. Build and install the Rust extensions:
    ```bash
-   cd soilmoisture_rs
+   cd polerisk_rs
    maturin develop --release
    ```
 
 4. Verify the installation:
    ```python
-   import soilmoisture_rs
+   import polerisk_rs
    print("Rust extensions loaded successfully!")
    ```
 
@@ -104,7 +104,7 @@ RUST_LOG=debug maturin develop
 2. Add it to the Python module in `lib.rs`:
    ```rust
    #[pymodule]
-   fn soilmoisture_rs(_py: Python, m: &PyModule) -> PyResult<()> {
+   fn polerisk_rs(_py: Python, m: &PyModule) -> PyResult<()> {
        m.add_function(wrap_pyfunction!(my_new_function, m)?)?;
        Ok(())
    }
@@ -124,7 +124,7 @@ A: No, the package includes pure Python implementations as fallbacks. Rust is on
 A: The package will print a warning if Rust extensions are not available. You can also check:
 
 ```python
-from soilmoisture.analysis.statistics import RUST_AVAILABLE
+from polerisk.analysis.statistics import RUST_AVAILABLE
 print(f"Using Rust: {RUST_AVAILABLE}")
 ```
 
@@ -135,7 +135,7 @@ A: Yes, but you'll need to install the Microsoft C++ Build Tools and ensure Rust
 A: After updating the Rust code, simply rebuild:
 
 ```bash
-cd soilmoisture_rs
+cd polerisk_rs
 maturin develop --release
 ```
 
