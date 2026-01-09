@@ -21,7 +21,7 @@ signalplot>=0.1.2  # Minimalist plotting defaults for Matplotlib
 ts2net>=0.7.0  # Time series to network conversion for pattern analysis
 
 # Anomaly detection
-anomaly-detection-toolkit>=1.0.0  # Comprehensive anomaly detection methods
+anomaly-detection-toolkit>=0.1.1  # Comprehensive anomaly detection methods
 
 # Web interface dependencies
 flask>=2.0.0

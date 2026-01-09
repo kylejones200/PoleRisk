@@ -40,7 +40,7 @@ setup(
         'jinja2>=3.0.0',
         'signalplot>=0.1.2',
         'ts2net>=0.7.0',
-        'anomaly-detection-toolkit>=1.0.0',
+        'anomaly-detection-toolkit>=0.1.1',
         # 'folium>=0.12.0',  # Optional: For interactive maps (install separately if needed)
     ],
 )
