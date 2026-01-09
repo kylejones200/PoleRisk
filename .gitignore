@@ -129,6 +129,7 @@ dmypy.json
 *.swp
 *.swo
 *~
+.cursor/
 
 # OS
 .DS_Store
