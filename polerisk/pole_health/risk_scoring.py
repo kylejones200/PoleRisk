@@ -431,23 +431,31 @@ class MaintenanceScheduler:
     ) -> Dict:
         """Analyze what can be accomplished within budget constraints."""
         # Sort by priority and cost-effectiveness
-        sorted_df = schedule_df.sort_values(["maintenance_priority", "estimated_cost"])
+        sorted_df = schedule_df.sort_values(
+            ["maintenance_priority", "estimated_cost"]
+        ).copy()
 
-        cumulative_cost = 0
-        affordable_poles = []
+        # Vectorized cumulative sum calculation
+        sorted_df["cumulative_cost"] = sorted_df["estimated_cost"].cumsum()
 
-        for _, row in sorted_df.iterrows():
-            if cumulative_cost + row["estimated_cost"] <= budget_limit:
-                cumulative_cost += row["estimated_cost"]
-                affordable_poles.append(row["pole_id"])
-            else:
-                break
+        # Find all poles within budget using vectorized operation
+        within_budget_mask = sorted_df["cumulative_cost"] <= budget_limit
+        affordable_poles = sorted_df[within_budget_mask]["pole_id"].tolist()
+        cumulative_cost = (
+            sorted_df[within_budget_mask]["cumulative_cost"].iloc[-1]
+            if within_budget_mask.any()
+            else 0.0
+        )
+
+        PERCENT_CONVERSION = 100.0
 
         return {
             "poles_within_budget": len(affordable_poles),
             "cost_within_budget": cumulative_cost,
             "budget_utilization": (
-                (cumulative_cost / budget_limit * 100) if budget_limit > 0 else 0
+                (cumulative_cost / budget_limit * PERCENT_CONVERSION)
+                if budget_limit > 0
+                else 0.0
             ),
             "poles_deferred": len(schedule_df) - len(affordable_poles),
             "cost_deferred": schedule_df["estimated_cost"].sum() - cumulative_cost,

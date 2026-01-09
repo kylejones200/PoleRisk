@@ -14,6 +14,12 @@ import pandas as pd
 
 from ..utils.time_utils import utc2local
 
+# Constants for time window filtering
+MINUTES_PER_HOUR = 60
+MORNING_WINDOW_START_MINUTES = 30  # 00:30
+MORNING_WINDOW_END_MINUTES = 150  # 02:30
+MISSING_DATA_VALUE = -9999
+
 
 def _read_insitu_data(in_situ_path: Path) -> pd.DataFrame:
     """
@@ -53,7 +59,12 @@ def _read_insitu_data(in_situ_path: Path) -> pd.DataFrame:
             delim_whitespace=True,
             header=None,
             names=column_names,
-            na_values=[-9999, -9999.0, "-9999", "-9999.0"],
+            na_values=[
+                MISSING_DATA_VALUE,
+                float(MISSING_DATA_VALUE),
+                str(MISSING_DATA_VALUE),
+                f"{MISSING_DATA_VALUE}.0",
+            ],
             dtype={"utc_date": str, "utc_time": str},
         )
 
@@ -75,6 +86,8 @@ def _convert_to_local_time(
     """
     Convert UTC times to local times and filter valid soil moisture measurements.
 
+    Uses vectorized operations for better performance.
+
     Args:
         data: DataFrame containing in-situ measurements.
 
@@ -84,31 +97,37 @@ def _convert_to_local_time(
             - local_times: List of local times in 'HH:MM' format
             - local_sm: List of soil moisture values
     """
+    logger = logging.getLogger(__name__)
+
+    # Filter out rows with missing critical data using vectorized operations
+    valid_mask = data["lat"].notna() & data["lon"].notna() & data["sm"].notna()
+    valid_data = data[valid_mask].copy()
+
+    if valid_data.empty:
+        logger.warning("No valid rows found in input data")
+        return [], [], []
+
+    # Vectorized conversion to local time
     local_dates = []
     local_times = []
     local_sm = []
 
-    for _, row in data.iterrows():
+    for idx in valid_data.index:
         try:
-            lat = row["lat"]
-            lon = row["lon"]
-            utc_date = row["utc_date"]
-            utc_time = row["utc_time"]
-            sm = row["sm"]
-
-            # Skip rows with missing data
-            if pd.isna(lat) or pd.isna(lon) or pd.isna(sm):
-                continue
+            lon = valid_data.loc[idx, "lon"]
+            utc_date = valid_data.loc[idx, "utc_date"]
+            utc_time = valid_data.loc[idx, "utc_time"]
+            sm = valid_data.loc[idx, "sm"]
 
             # Convert to local time
             local_date, local_time = utc2local(lon, utc_date, utc_time)
 
             local_dates.append(local_date)
             local_times.append(local_time)
-            local_sm.append(sm)
+            local_sm.append(float(sm))
 
         except Exception as e:
-            logging.warning(f"Error processing row {_}: {e}")
+            logger.warning(f"Error processing row {idx}: {e}")
             continue
 
     return local_dates, local_times, local_sm
@@ -120,6 +139,8 @@ def _get_morning_measurements(
     """
     Extract soil moisture measurements within the morning time window (00:30-02:30).
 
+    Uses vectorized operations for better performance.
+
     Args:
         times: List of time strings in 'HH:MM' format
         sm_values: List of soil moisture values
@@ -130,26 +151,44 @@ def _get_morning_measurements(
             - morning_sm: Soil moisture values within the morning window
             - morning_times: Corresponding times within the morning window
     """
-    morning_sm = []
-    morning_times = []
+    logger = logging.getLogger(__name__)
 
-    for time, sm in zip(times, sm_values):
+    if not times or not sm_values:
+        logger.warning(f"No data provided for date {date}")
+        return [], []
+
+    # Vectorized time parsing and filtering
+    minutes_list = []
+    valid_indices = []
+
+    for idx, time in enumerate(times):
         try:
             hour, minute = map(int, time.split(":"))
-            # Convert to minutes since midnight
-            minutes_since_midnight = hour * 60 + minute
-
-            # Check if time is between 00:30 and 02:30
-            if 30 <= minutes_since_midnight <= 150:  # 00:30 to 02:30
-                morning_sm.append(sm)
-                morning_times.append(time)
-
-        except Exception as e:
-            logging.warning(f"Error processing time {time}: {e}")
+            minutes_since_midnight = hour * MINUTES_PER_HOUR + minute
+            minutes_list.append(minutes_since_midnight)
+            valid_indices.append(idx)
+        except (ValueError, AttributeError) as e:
+            logger.warning(f"Error parsing time {time}: {e}")
             continue
 
+    if not minutes_list:
+        logger.warning(f"No valid times found for date {date}")
+        return [], []
+
+    # Vectorized filtering using numpy
+    minutes_array = np.array(minutes_list)
+    valid_sm_array = np.array([sm_values[i] for i in valid_indices])
+    valid_times_array = np.array([times[i] for i in valid_indices])
+
+    morning_mask = (minutes_array >= MORNING_WINDOW_START_MINUTES) & (
+        minutes_array <= MORNING_WINDOW_END_MINUTES
+    )
+
+    morning_sm = valid_sm_array[morning_mask].tolist()
+    morning_times = valid_times_array[morning_mask].tolist()
+
     if not morning_sm:
-        logging.warning(f"No morning measurements found for date {date}")
+        logger.warning(f"No morning measurements found for date {date}")
 
     return morning_sm, morning_times
 
@@ -186,7 +225,13 @@ def match_insitu_with_lprm(
     # Group by date
     unique_dates = sorted(set(local_dates))
 
-    # Initialize result arrays
+    # Convert to numpy arrays for vectorized operations (much faster)
+    local_dates_array = np.array(local_dates)
+    local_times_array = np.array(local_times, dtype=object)
+    local_sm_array = np.array(local_sm)
+
+    # Initialize result arrays with pre-allocated size for better performance
+    max_results = len(unique_dates)
     in_situ_series = []
     satellite_series = []
     result_dates = []
@@ -194,13 +239,13 @@ def match_insitu_with_lprm(
     no_morning_data_dates = []
     missing_satellite_dates = []
 
-    # Process each date
+    # Process each date using vectorized filtering
     for date in unique_dates:
         try:
-            # Get all measurements for this date
-            date_mask = [d == date for d in local_dates]
-            times = [t for t, m in zip(local_times, date_mask) if m]
-            sm_values = [s for s, m in zip(local_sm, date_mask) if m]
+            # Vectorized date filtering (much faster than list comprehension)
+            date_mask = local_dates_array == date
+            times = local_times_array[date_mask].tolist()
+            sm_values = local_sm_array[date_mask].tolist()
 
             # Get morning measurements (00:30-02:30)
             morning_sm, morning_times = _get_morning_measurements(

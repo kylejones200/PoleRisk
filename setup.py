@@ -39,6 +39,8 @@ setup(
         'joblib>=1.0.0',
         'jinja2>=3.0.0',
         'signalplot>=0.1.2',
-        'folium>=0.12.0',
+        'ts2net>=0.7.0',
+        'anomaly-detection-toolkit>=1.0.0',
+        # 'folium>=0.12.0',  # Optional: For interactive maps (install separately if needed)
     ],
 )

@@ -100,6 +100,19 @@ from .ts2net_integration import (
     batch_analyze_time_series,
 )
 
+try:
+    from .anomaly_detection_integration import (
+        AnomalyDetectionMethod,
+        AnomalyDetectionResult,
+        EnsembleAnomalyResult,
+        AnomalyDetector,
+        EnsembleAnomalyDetector,
+    )
+
+    ANOMALY_DETECTION_AVAILABLE = True
+except ImportError:
+    ANOMALY_DETECTION_AVAILABLE = False
+
 __all__ = [
     "PoleHealthAssessment",
     "SoilConditionAnalyzer",
@@ -175,3 +188,14 @@ __all__ = [
     "TS2NetAnalyzer",
     "batch_analyze_time_series",
 ]
+
+if ANOMALY_DETECTION_AVAILABLE:
+    __all__.extend(
+        [
+            "AnomalyDetectionMethod",
+            "AnomalyDetectionResult",
+            "EnsembleAnomalyResult",
+            "AnomalyDetector",
+            "EnsembleAnomalyDetector",
+        ]
+    )

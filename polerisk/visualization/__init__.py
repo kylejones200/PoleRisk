@@ -15,6 +15,11 @@ from .plots import (
 )
 from .pole_health_viz import PoleHealthVisualizer
 from .network_visualization import NetworkTimeSeriesVisualizer
+from .time_series_viz import (
+    plot_time_series_enhanced,
+    plot_decomposition_enhanced,
+    set_time_series_style,
+)
 
 __all__ = [
     "plot_time_series",
@@ -25,4 +30,7 @@ __all__ = [
     "create_dashboard",
     "PoleHealthVisualizer",
     "NetworkTimeSeriesVisualizer",
+    "plot_time_series_enhanced",
+    "plot_decomposition_enhanced",
+    "set_time_series_style",
 ]

@@ -14,6 +14,29 @@ from ..analysis.statistics import calculate_correlation, calculate_rmse
 
 logger = logging.getLogger(__name__)
 
+# Risk assessment constants
+MOISTURE_RISK_SCALING_HIGH = 0.2  # Scaling factor for high moisture risk calculation
+MOISTURE_RISK_SCALING_LOW = 0.05  # Scaling factor for low moisture risk calculation
+MODERATE_RISK_OUTSIDE_OPTIMAL = (
+    0.3  # Moderate risk for values outside optimal but acceptable
+)
+PH_RISK_SCALING_LOW = 2.0  # Scaling factor for low pH (acidic) risk
+PH_RISK_SCALING_HIGH = 3.0  # Scaling factor for high pH (alkaline) risk
+PH_RISK_MAX_ALKALINE = 0.7  # Maximum risk for alkaline soil
+EC_RISK_SCALING = 4.0  # Scaling factor for electrical conductivity risk
+BEARING_CAPACITY_RISK_SCALING = 50.0  # Scaling factor for bearing capacity risk
+BEARING_CAPACITY_MODERATE_RISK = 0.4  # Moderate risk for suboptimal bearing capacity
+DENSITY_RISK_SCALING = 0.5  # Scaling factor for bulk density risk
+DENSITY_RISK_MAX_LOW = 0.8  # Maximum risk for too loose (low density)
+DENSITY_RISK_MAX_HIGH = 0.6  # Maximum risk for too dense
+TREND_SLOPE_THRESHOLD = 0.01  # Significant change threshold per sample
+TREND_RISK_SCALING = 10.0  # Scaling factor for trend risk
+NETWORK_DENSITY_THRESHOLD = 0.8  # High density threshold for network analysis
+NETWORK_DENSITY_RISK_INCREMENT = 0.3  # Risk increment for high network density
+NETWORK_ANOMALY_RISK_INCREMENT = 0.2  # Risk increment for network anomalies
+MIN_SAMPLES_FOR_TREND = 2  # Minimum samples required for trend analysis
+MIN_SAMPLES_FOR_NETWORK = 10  # Minimum samples required for network analysis
+
 
 class SoilConditionAnalyzer:
     """Analyzes soil conditions for utility pole stability assessment."""
@@ -77,17 +100,20 @@ class SoilConditionAnalyzer:
 
     def _assess_moisture_risk(self, moisture: float) -> float:
         """Assess risk from soil moisture content."""
-        if moisture > self.critical_thresholds["moisture_content_high"]:
+        high_threshold = self.critical_thresholds["moisture_content_high"]
+        low_threshold = self.critical_thresholds["moisture_content_low"]
+
+        if moisture > high_threshold:
             # Very high moisture - erosion, instability
             return min(
                 1.0,
-                (moisture - self.critical_thresholds["moisture_content_high"]) / 0.2,
+                (moisture - high_threshold) / MOISTURE_RISK_SCALING_HIGH,
             )
-        elif moisture < self.critical_thresholds["moisture_content_low"]:
+        elif moisture < low_threshold:
             # Very low moisture - poor compaction, dust
             return min(
                 1.0,
-                (self.critical_thresholds["moisture_content_low"] - moisture) / 0.05,
+                (low_threshold - moisture) / MOISTURE_RISK_SCALING_LOW,
             )
         else:
             # Within acceptable range
@@ -96,54 +122,67 @@ class SoilConditionAnalyzer:
                 return 0.0
             else:
                 # Moderate risk outside optimal range but within acceptable limits
-                return 0.3
+                return MODERATE_RISK_OUTSIDE_OPTIMAL
 
     def _assess_ph_risk(self, ph: float) -> float:
         """Assess corrosion risk from soil pH."""
-        if ph < self.critical_thresholds["ph_low"]:
+        ph_low = self.critical_thresholds["ph_low"]
+        ph_high = self.critical_thresholds["ph_high"]
+
+        if ph < ph_low:
             # Acidic soil - high corrosion risk
-            return min(1.0, (self.critical_thresholds["ph_low"] - ph) / 2.0)
-        elif ph > self.critical_thresholds["ph_high"]:
+            return min(1.0, (ph_low - ph) / PH_RISK_SCALING_LOW)
+        elif ph > ph_high:
             # Alkaline soil - moderate chemical reaction risk
-            return min(0.7, (ph - self.critical_thresholds["ph_high"]) / 3.0)
+            return min(PH_RISK_MAX_ALKALINE, (ph - ph_high) / PH_RISK_SCALING_HIGH)
         else:
             return 0.0
 
     def _assess_ec_risk(self, ec: float) -> float:
         """Assess risk from electrical conductivity (salinity)."""
-        if ec > self.critical_thresholds["electrical_conductivity_high"]:
+        ec_high = self.critical_thresholds["electrical_conductivity_high"]
+
+        if ec > ec_high:
             # High salinity - corrosion risk
             return min(
                 1.0,
-                (ec - self.critical_thresholds["electrical_conductivity_high"]) / 4.0,
+                (ec - ec_high) / EC_RISK_SCALING,
             )
         else:
             return 0.0
 
     def _assess_bearing_capacity_risk(self, bearing_capacity: float) -> float:
         """Assess structural support risk from bearing capacity."""
-        if bearing_capacity < self.critical_thresholds["bearing_capacity_low"]:
+        capacity_low = self.critical_thresholds["bearing_capacity_low"]
+
+        if bearing_capacity < capacity_low:
             # Insufficient bearing capacity
             return min(
                 1.0,
-                (self.critical_thresholds["bearing_capacity_low"] - bearing_capacity)
-                / 50,
+                (capacity_low - bearing_capacity) / BEARING_CAPACITY_RISK_SCALING,
             )
         else:
             optimal_min, optimal_max = self.optimal_ranges["bearing_capacity"]
             if bearing_capacity < optimal_min:
-                return 0.4  # Moderate risk
+                return BEARING_CAPACITY_MODERATE_RISK
             return 0.0
 
     def _assess_density_risk(self, bulk_density: float) -> float:
         """Assess compaction risk from bulk density."""
         optimal_min, optimal_max = self.optimal_ranges["bulk_density"]
+
         if bulk_density < optimal_min:
             # Too loose - poor support
-            return min(0.8, (optimal_min - bulk_density) / 0.5)
+            return min(
+                DENSITY_RISK_MAX_LOW,
+                (optimal_min - bulk_density) / DENSITY_RISK_SCALING,
+            )
         elif bulk_density > optimal_max:
             # Too dense - drainage issues
-            return min(0.6, (bulk_density - optimal_max) / 0.5)
+            return min(
+                DENSITY_RISK_MAX_HIGH,
+                (bulk_density - optimal_max) / DENSITY_RISK_SCALING,
+            )
         return 0.0
 
     def analyze_temporal_trends(
@@ -155,30 +194,42 @@ class SoilConditionAnalyzer:
         Args:
             samples: List of soil samples
             use_network_analysis: If True, use ts2net for network-based pattern detection
+
+        Returns:
+            Dictionary containing trend analysis results including trend_risk,
+            moisture_trend, and optional network analysis features.
         """
-        if len(samples) < 2:
+        if len(samples) < MIN_SAMPLES_FOR_TREND:
             return {"trend_risk": 0.0}
 
         # Sort samples by date
         sorted_samples = sorted(samples, key=lambda x: x.sample_date)
 
-        # Extract time series data
-        dates = [s.sample_date for s in sorted_samples]
-        moisture_values = [
-            s.moisture_content for s in sorted_samples if s.moisture_content is not None
-        ]
+        # Extract time series data - use list comprehension with filter (faster)
+        # Pre-allocate numpy array instead of list.append()
+        moisture_values = np.array(
+            [
+                s.moisture_content
+                for s in sorted_samples
+                if s.moisture_content is not None
+            ],
+            dtype=np.float64,
+        )
+        dates = np.array(
+            [s.sample_date for s in sorted_samples[: len(moisture_values)]]
+        )
 
-        if len(moisture_values) < 2:
+        if len(moisture_values) < MIN_SAMPLES_FOR_TREND:
             return {"trend_risk": 0.0}
 
-        # Calculate basic trend
-        x = np.arange(len(moisture_values))
+        # Calculate basic trend using vectorized operations
+        x = np.arange(len(moisture_values), dtype=np.float64)
         slope = np.polyfit(x, moisture_values, 1)[0]
 
         # Assess trend risk
         trend_risk = 0.0
-        if abs(slope) > 0.01:  # Significant change in moisture per sample
-            trend_risk = min(1.0, abs(slope) * 10)
+        if abs(slope) > TREND_SLOPE_THRESHOLD:
+            trend_risk = min(1.0, abs(slope) * TREND_RISK_SCALING)
 
         result = {
             "trend_risk": trend_risk,
@@ -187,7 +238,7 @@ class SoilConditionAnalyzer:
         }
 
         # Add network-based analysis if requested and available
-        if use_network_analysis and len(moisture_values) >= 10:
+        if use_network_analysis and len(moisture_values) >= MIN_SAMPLES_FOR_NETWORK:
             try:
                 from .ts2net_integration import TS2NetAnalyzer, NetworkMethod
                 import pandas as pd
@@ -214,8 +265,13 @@ class SoilConditionAnalyzer:
                     )
 
                     # High density may indicate complex patterns (potential issues)
-                    if network_analysis.hvg_features.density > 0.8:
-                        result["trend_risk"] = max(result["trend_risk"], 0.3)
+                    if (
+                        network_analysis.hvg_features.density
+                        > NETWORK_DENSITY_THRESHOLD
+                    ):
+                        result["trend_risk"] = max(
+                            result["trend_risk"], NETWORK_DENSITY_RISK_INCREMENT
+                        )
 
                     if network_analysis.is_anomalous:
                         result["network_anomaly"] = True
@@ -223,7 +279,9 @@ class SoilConditionAnalyzer:
                         result["network_anomaly_reasons"] = (
                             network_analysis.anomaly_reasons
                         )
-                        result["trend_risk"] = min(1.0, result["trend_risk"] + 0.2)
+                        result["trend_risk"] = min(
+                            1.0, result["trend_risk"] + NETWORK_ANOMALY_RISK_INCREMENT
+                        )
 
                 # Add transition network features for pattern detection
                 if network_analysis and network_analysis.transition_features:
@@ -238,6 +296,79 @@ class SoilConditionAnalyzer:
                 logger.debug("ts2net not available for network analysis")
             except Exception as e:
                 logger.warning(f"Network analysis failed: {e}")
+
+        # Add comprehensive anomaly detection using anomaly-detection-toolkit
+        if len(moisture_values) >= MIN_SAMPLES_FOR_NETWORK:
+            try:
+                from .anomaly_detection_integration import (
+                    AnomalyDetector,
+                    AnomalyDetectionMethod,
+                    EnsembleAnomalyDetector,
+                )
+                import pandas as pd
+
+                # Use ensemble detection for robust results
+                ensemble_detector = EnsembleAnomalyDetector(
+                    methods=[
+                        AnomalyDetectionMethod.ISOLATION_FOREST,
+                        AnomalyDetectionMethod.LOF,
+                        AnomalyDetectionMethod.WAVELET,
+                    ],
+                    method_params={
+                        "contamination": 0.05,  # Expect 5% anomalies
+                    },
+                )
+
+                timestamps = pd.DatetimeIndex(dates[: len(moisture_values)])
+                ensemble_result = ensemble_detector.detect_ensemble(
+                    time_series=moisture_values,
+                    timestamps=timestamps,
+                    pole_id="",
+                    time_series_name="soil_moisture",
+                    consensus_threshold=0.5,  # 50% of detectors must agree
+                )
+
+                # Add anomaly detection results
+                result["anomaly_detection_n_anomalies"] = ensemble_result.n_anomalies
+                result["anomaly_detection_rate"] = ensemble_result.anomaly_rate
+                result["anomaly_detection_mean_score"] = float(
+                    ensemble_result.consensus_scores.mean()
+                )
+                result["anomaly_detection_max_score"] = float(
+                    ensemble_result.consensus_scores.max()
+                )
+
+                # Individual detector results
+                for (
+                    method_name,
+                    individual_result,
+                ) in ensemble_result.individual_results.items():
+                    result[f"anomaly_{method_name}_n_anomalies"] = (
+                        individual_result.n_anomalies
+                    )
+                    result[f"anomaly_{method_name}_rate"] = (
+                        individual_result.anomaly_rate
+                    )
+
+                # Flag if anomalies detected by consensus
+                if ensemble_result.n_anomalies > 0:
+                    result["anomaly_detected"] = True
+                    result["trend_risk"] = min(
+                        1.0,
+                        result["trend_risk"]
+                        + (
+                            ensemble_result.anomaly_rate / 100 * 0.3
+                        ),  # Up to 0.3 risk increment
+                    )
+                else:
+                    result["anomaly_detected"] = False
+
+            except ImportError:
+                logger.debug(
+                    "anomaly-detection-toolkit not available for anomaly detection"
+                )
+            except Exception as e:
+                logger.warning(f"Anomaly detection failed: {e}")
 
         return result
 

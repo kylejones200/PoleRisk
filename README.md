@@ -22,7 +22,12 @@ Data-Driven Insights
 
 Machine Learning Models
 - Failure prediction models
-- Anomaly detection for unusual deterioration
+- **Comprehensive anomaly detection** using [anomaly-detection-toolkit](https://github.com/kylejones200/anomaly-detection-toolkit)
+  - Statistical methods (Z-score, IQR, seasonal baseline)
+  - ML methods (Isolation Forest, LOF, Robust Covariance)
+  - Wavelet-based time series analysis
+  - Deep learning methods (LSTM, PyTorch autoencoders)
+  - Ensemble detection for robust results
 - Risk clustering and pattern recognition
 - Custom model training on your data
 
@@ -38,16 +43,23 @@ Reporting & Visualization
 pip install polerisk
 ```
 
+The package includes the following dependencies:
+- **ts2net**: Time series to network conversion for pattern analysis
+- **anomaly-detection-toolkit**: Comprehensive anomaly detection methods
+
 ### Optional Packages
 
 Install additional capabilities based on your needs:
 
 ```bash
-# For enhanced performance
+# For enhanced performance (Numba JIT compilation)
 pip install polerisk[performance]
 
-# For machine learning features
+# For machine learning features (TensorFlow, PyTorch)
 pip install polerisk[ml]
+
+# For deep learning anomaly detection
+pip install anomaly-detection-toolkit[deep]
 
 # For web dashboard
 pip install polerisk[web]

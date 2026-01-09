@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import signalplot
 from typing import Dict, List, Optional, Tuple
-import folium
-from folium import plugins
 import warnings
 import logging
 
@@ -17,6 +15,19 @@ warnings.filterwarnings("ignore")
 
 # Apply SignalPlot minimalist defaults
 signalplot.apply()
+
+# Optional import for interactive maps
+try:
+    import folium
+    from folium import plugins
+
+    FOLIUM_AVAILABLE = True
+except ImportError:
+    FOLIUM_AVAILABLE = False
+    logger = logging.getLogger(__name__)
+    logger.debug(
+        "folium not available. Interactive map functionality will be disabled."
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -461,8 +472,15 @@ class PoleHealthVisualizer:
 
     def create_interactive_map(
         self, assessment_df: pd.DataFrame, output_dir: str = "Analysis"
-    ) -> str:
+    ) -> Optional[str]:
         """Create interactive map of pole locations with health indicators."""
+        if not FOLIUM_AVAILABLE:
+            logger.warning(
+                "folium is required for interactive maps. "
+                "Install with: pip install folium"
+            )
+            return None
+
         import os
 
         os.makedirs(output_dir, exist_ok=True)

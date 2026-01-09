@@ -297,62 +297,103 @@ class StructuralConditionAnalyzer:
         elif pole_age > 20:
             frequency = int(frequency * 0.9)  # 10% more frequent
 
-        return max(6, frequency)  # Minimum 6 months
+        MIN_INSPECTION_FREQUENCY_MONTHS = 6
+        return max(MIN_INSPECTION_FREQUENCY_MONTHS, frequency)
+
+    def _generate_wood_recommendations(
+        self, inspection: StructuralInspection
+    ) -> List[str]:
+        """Generate wood-specific maintenance recommendations."""
+        recommendations = []
+
+        if (
+            inspection.wood_decay_depth is not None
+            and inspection.wood_decay_depth > self.wood_thresholds["decay_depth_fair"]
+        ):
+            recommendations.append("Consider wood preservation treatment")
+            recommendations.append("Monitor decay progression quarterly")
+
+        if (
+            inspection.wood_circumferential_loss is not None
+            and inspection.wood_circumferential_loss
+            > self.wood_thresholds["circumferential_loss_fair"]
+        ):
+            recommendations.append("Evaluate for steel band reinforcement")
+
+        return recommendations
+
+    def _generate_steel_recommendations(
+        self, inspection: StructuralInspection
+    ) -> List[str]:
+        """Generate steel-specific maintenance recommendations."""
+        recommendations = []
+
+        if (
+            inspection.steel_corrosion_level is not None
+            and inspection.steel_corrosion_level
+            >= self.steel_thresholds["corrosion_level_poor"]
+        ):
+            recommendations.append("Apply corrosion protection treatment")
+            recommendations.append("Inspect coating system integrity")
+
+        if (
+            inspection.coating_condition
+            and "poor" in inspection.coating_condition.lower()
+        ):
+            recommendations.append("Schedule coating renewal")
+
+        return recommendations
+
+    def _generate_concrete_recommendations(
+        self, inspection: StructuralInspection
+    ) -> List[str]:
+        """Generate concrete-specific maintenance recommendations."""
+        recommendations = []
+
+        if inspection.concrete_cracking:
+            recommendations.append("Seal cracks to prevent water infiltration")
+            recommendations.append("Monitor crack progression")
+
+        if inspection.concrete_spalling:
+            recommendations.append("Repair spalled areas")
+            recommendations.append("Evaluate reinforcement corrosion")
+
+        return recommendations
 
     def generate_recommendations(
         self, inspection: StructuralInspection, condition_score: float, pole_type: str
     ) -> List[str]:
         """Generate specific maintenance recommendations."""
+        # Constants for condition score thresholds
+        CRITICAL_CONDITION_THRESHOLD = 30
+        POOR_CONDITION_THRESHOLD = 50
+        FAIR_CONDITION_THRESHOLD = 70
+        INSPECTION_FREQUENCY_MONTHS = 6
+
         recommendations = []
 
+        # Constants for urgent action
+        URGENT_REPLACEMENT_DAYS = 30
+
         # Critical conditions requiring immediate action
-        if condition_score < 30:
+        if condition_score < CRITICAL_CONDITION_THRESHOLD:
             recommendations.append(
-                "URGENT: Pole replacement recommended within 30 days"
+                f"URGENT: Pole replacement recommended within {URGENT_REPLACEMENT_DAYS} days"
             )
             recommendations.append("Install temporary support if needed")
             recommendations.append("Restrict climbing until replacement")
 
-        # Material-specific recommendations
-        if pole_type.lower() == "wood":
-            if (
-                inspection.wood_decay_depth is not None
-                and inspection.wood_decay_depth
-                > self.wood_thresholds["decay_depth_fair"]
-            ):
-                recommendations.append("Consider wood preservation treatment")
-                recommendations.append("Monitor decay progression quarterly")
+        # Material-specific recommendations using dict dispatch pattern
+        material_handlers = {
+            "wood": self._generate_wood_recommendations,
+            "steel": self._generate_steel_recommendations,
+            "concrete": self._generate_concrete_recommendations,
+        }
 
-            if (
-                inspection.wood_circumferential_loss is not None
-                and inspection.wood_circumferential_loss
-                > self.wood_thresholds["circumferential_loss_fair"]
-            ):
-                recommendations.append("Evaluate for steel band reinforcement")
-
-        elif pole_type.lower() == "steel":
-            if (
-                inspection.steel_corrosion_level is not None
-                and inspection.steel_corrosion_level
-                >= self.steel_thresholds["corrosion_level_poor"]
-            ):
-                recommendations.append("Apply corrosion protection treatment")
-                recommendations.append("Inspect coating system integrity")
-
-            if (
-                inspection.coating_condition
-                and "poor" in inspection.coating_condition.lower()
-            ):
-                recommendations.append("Schedule coating renewal")
-
-        elif pole_type.lower() == "concrete":
-            if inspection.concrete_cracking:
-                recommendations.append("Seal cracks to prevent water infiltration")
-                recommendations.append("Monitor crack progression")
-
-            if inspection.concrete_spalling:
-                recommendations.append("Repair spalled areas")
-                recommendations.append("Evaluate reinforcement corrosion")
+        pole_type_lower = pole_type.lower()
+        if pole_type_lower in material_handlers:
+            material_recommendations = material_handlers[pole_type_lower](inspection)
+            recommendations.extend(material_recommendations)
 
         # Geometry issues
         if (
@@ -363,11 +404,13 @@ class StructuralConditionAnalyzer:
             recommendations.append("Consider guy wire installation")
 
         # General recommendations based on condition
-        if 30 <= condition_score < 50:
+        if CRITICAL_CONDITION_THRESHOLD <= condition_score < POOR_CONDITION_THRESHOLD:
             recommendations.append("Increase inspection frequency to annual")
             recommendations.append("Document condition changes with photos")
-        elif 50 <= condition_score < 70:
-            recommendations.append("Schedule detailed inspection within 6 months")
+        elif POOR_CONDITION_THRESHOLD <= condition_score < FAIR_CONDITION_THRESHOLD:
+            recommendations.append(
+                f"Schedule detailed inspection within {INSPECTION_FREQUENCY_MONTHS} months"
+            )
             recommendations.append("Monitor for condition changes")
 
         if not recommendations:

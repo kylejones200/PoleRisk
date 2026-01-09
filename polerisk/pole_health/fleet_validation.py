@@ -164,19 +164,14 @@ class FleetValidationAnalyzer:
         )
         merged["actual_failure"] = merged["failure_date"].notna()
 
-        # Calculate confusion matrix
-        tp = (
-            (merged["predicted_failure"] == True) & (merged["actual_failure"] == True)
-        ).sum()
-        fp = (
-            (merged["predicted_failure"] == True) & (merged["actual_failure"] == False)
-        ).sum()
-        tn = (
-            (merged["predicted_failure"] == False) & (merged["actual_failure"] == False)
-        ).sum()
-        fn = (
-            (merged["predicted_failure"] == False) & (merged["actual_failure"] == True)
-        ).sum()
+        # Calculate confusion matrix using vectorized operations
+        predicted = merged["predicted_failure"].fillna(False)
+        actual = merged["actual_failure"].fillna(False)
+
+        tp = (predicted & actual).sum()
+        fp = (predicted & ~actual).sum()
+        tn = (~predicted & ~actual).sum()
+        fn = (~predicted & actual).sum()
 
         # Calculate metrics
         total = tp + fp + tn + fn
@@ -194,22 +189,34 @@ class FleetValidationAnalyzer:
         sensitivity_ci = self._wilson_confidence_interval(tp, tp + fn)
         precision_ci = self._wilson_confidence_interval(tp, tp + fp)
 
+        # Constants for rate calculations
+        RATE_SCALING_PER_1000 = 1000.0
+        COST_AVOIDANCE_FACTOR = 0.5  # Assume 50% cost avoidance from early intervention
+
         # Alert metrics
         total_alerts = tp + fp
         total_poles = len(predictions_df["pole_id"].unique())
-        alert_rate = (total_alerts / total_poles * 1000) if total_poles > 0 else 0.0
-        false_alert_rate = (fp / total_poles * 1000) if total_poles > 0 else 0.0
+        alert_rate = (
+            (total_alerts / total_poles * RATE_SCALING_PER_1000)
+            if total_poles > 0
+            else 0.0
+        )
+        false_alert_rate = (
+            (fp / total_poles * RATE_SCALING_PER_1000) if total_poles > 0 else 0.0
+        )
 
         # Failure metrics
         total_failures = tp + fn
         missed_failures = fn
         detected_failures = tp
-        failure_rate = (total_failures / total_poles * 1000) if total_poles > 0 else 0.0
+        failure_rate = (
+            (total_failures / total_poles * RATE_SCALING_PER_1000)
+            if total_poles > 0
+            else 0.0
+        )
 
         # Cost impact
-        avoided_costs = (
-            tp * self.failure_cost_per_incident * 0.5
-        )  # Assume 50% cost avoidance
+        avoided_costs = tp * self.failure_cost_per_incident * COST_AVOIDANCE_FACTOR
         false_alert_costs = fp * self.false_alert_cost
         missed_failure_costs = fn * self.failure_cost_per_incident
         total_cost_impact = avoided_costs - false_alert_costs - missed_failure_costs
@@ -415,22 +422,14 @@ class FleetValidationAnalyzer:
             if len(cat_data) == 0:
                 continue
 
-            tp = (
-                (cat_data["predicted_failure"] == True)
-                & (cat_data["actual_failure"] == True)
-            ).sum()
-            fp = (
-                (cat_data["predicted_failure"] == True)
-                & (cat_data["actual_failure"] == False)
-            ).sum()
-            fn = (
-                (cat_data["predicted_failure"] == False)
-                & (cat_data["actual_failure"] == True)
-            ).sum()
-            tn = (
-                (cat_data["predicted_failure"] == False)
-                & (cat_data["actual_failure"] == False)
-            ).sum()
+            # Vectorized confusion matrix calculation
+            predicted = cat_data["predicted_failure"].fillna(False)
+            actual = cat_data["actual_failure"].fillna(False)
+
+            tp = (predicted & actual).sum()
+            fp = (predicted & ~actual).sum()
+            fn = (~predicted & actual).sum()
+            tn = (~predicted & ~actual).sum()
 
             sensitivity = tp / (tp + fn) if (tp + fn) > 0 else 0.0
             precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
@@ -464,18 +463,13 @@ class FleetValidationAnalyzer:
             if len(month_data) == 0:
                 continue
 
-            tp = (
-                (month_data["predicted_failure"] == True)
-                & (month_data["actual_failure"] == True)
-            ).sum()
-            fp = (
-                (month_data["predicted_failure"] == True)
-                & (month_data["actual_failure"] == False)
-            ).sum()
-            fn = (
-                (month_data["predicted_failure"] == False)
-                & (month_data["actual_failure"] == True)
-            ).sum()
+            # Vectorized confusion matrix calculation
+            predicted = month_data["predicted_failure"].fillna(False)
+            actual = month_data["actual_failure"].fillna(False)
+
+            tp = (predicted & actual).sum()
+            fp = (predicted & ~actual).sum()
+            fn = (~predicted & actual).sum()
 
             sensitivity = tp / (tp + fn) if (tp + fn) > 0 else 0.0
             precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0

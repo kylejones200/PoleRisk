@@ -158,32 +158,40 @@ class DataLoader:
             date_columns=date_columns,
         )
 
+        # Use itertuples for ~10x faster iteration than iterrows()
         poles = []
+        DEFAULT_HEIGHT_FT = 40.0
+        DEFAULT_INSTALL_DATE = pd.Timestamp("2000-01-01")
 
-        for idx, row in df.iterrows():
+        for row in df.itertuples(index=False):
             try:
+                # Access row attributes directly (much faster than dict access)
+                height_ft = (
+                    float(row.height_ft)
+                    if hasattr(row, "height_ft") and pd.notna(row.height_ft)
+                    else DEFAULT_HEIGHT_FT
+                )
+
                 pole = PoleInfo(
-                    pole_id=str(row["pole_id"]),
-                    latitude=float(row["latitude"]),
-                    longitude=float(row["longitude"]),
-                    pole_type=row.get("pole_type", "wood"),
-                    material=row.get("material", "Unknown"),
-                    height_ft=(
-                        float(row.get("height_ft", 40.0))
-                        if pd.notna(row.get("height_ft"))
-                        else 40.0
-                    ),
-                    install_date=row.get("install_date", pd.Timestamp("2000-01-01")),
-                    voltage_class=row.get("voltage_class", "distribution"),
-                    structure_type=row.get("structure_type", "tangent"),
-                    diameter_base_inches=row.get("diameter_base_inches"),
-                    treatment_type=row.get("treatment_type"),
-                    condition_rating=row.get("condition_rating"),
+                    pole_id=str(row.pole_id),
+                    latitude=float(row.latitude),
+                    longitude=float(row.longitude),
+                    pole_type=getattr(row, "pole_type", "wood"),
+                    material=getattr(row, "material", "Unknown"),
+                    height_ft=height_ft,
+                    install_date=getattr(row, "install_date", DEFAULT_INSTALL_DATE),
+                    voltage_class=getattr(row, "voltage_class", "distribution"),
+                    structure_type=getattr(row, "structure_type", "tangent"),
+                    diameter_base_inches=getattr(row, "diameter_base_inches", None),
+                    treatment_type=getattr(row, "treatment_type", None),
+                    condition_rating=getattr(row, "condition_rating", None),
                 )
                 poles.append(pole)
 
-            except (ValueError, TypeError) as e:
-                logger.warning(f"Skipping invalid pole data at row {idx}: {str(e)}")
+            except (ValueError, TypeError, AttributeError) as e:
+                # Get row index from itertuples by tracking manually
+                row_idx = len(poles)
+                logger.warning(f"Skipping invalid pole data at row {row_idx}: {str(e)}")
                 continue
 
         logger.info(
@@ -218,40 +226,54 @@ class DataLoader:
 
         samples = []
 
-        for idx, row in df.iterrows():
+        # Use itertuples for ~10x faster iteration than iterrows()
+        # Access attributes directly (much faster than dict access)
+        DEFAULT_DEPTH_INCHES = 12.0
+
+        for row in df.itertuples(index=False):
             try:
+                depth_inches = (
+                    float(row.depth_inches)
+                    if hasattr(row, "depth_inches") and pd.notna(row.depth_inches)
+                    else DEFAULT_DEPTH_INCHES
+                )
+
                 sample = SoilSample(
-                    pole_id=str(row["pole_id"]),
-                    sample_date=row["sample_date"],
-                    depth_inches=(
-                        float(row.get("depth_inches", 12.0))
-                        if pd.notna(row.get("depth_inches"))
-                        else 12.0
+                    pole_id=str(row.pole_id),
+                    sample_date=row.sample_date,
+                    depth_inches=depth_inches,
+                    moisture_content=float(row.moisture_content),
+                    ph=(
+                        getattr(row, "ph", None)
+                        if hasattr(row, "ph") and pd.notna(getattr(row, "ph", None))
+                        else None
                     ),
-                    moisture_content=float(row["moisture_content"]),
-                    ph=row.get("ph") if pd.notna(row.get("ph")) else None,
                     bulk_density=(
-                        row.get("bulk_density")
-                        if pd.notna(row.get("bulk_density"))
+                        getattr(row, "bulk_density", None)
+                        if hasattr(row, "bulk_density")
+                        and pd.notna(getattr(row, "bulk_density", None))
                         else None
                     ),
                     electrical_conductivity=(
-                        row.get("electrical_conductivity")
-                        if pd.notna(row.get("electrical_conductivity"))
+                        getattr(row, "electrical_conductivity", None)
+                        if hasattr(row, "electrical_conductivity")
+                        and pd.notna(getattr(row, "electrical_conductivity", None))
                         else None
                     ),
                     bearing_capacity=(
-                        row.get("bearing_capacity")
-                        if pd.notna(row.get("bearing_capacity"))
+                        getattr(row, "bearing_capacity", None)
+                        if hasattr(row, "bearing_capacity")
+                        and pd.notna(getattr(row, "bearing_capacity", None))
                         else None
                     ),
-                    soil_type=row.get("soil_type"),
+                    soil_type=getattr(row, "soil_type", None),
                     data_quality=row.get("data_quality", "good"),
                 )
                 samples.append(sample)
 
-            except (ValueError, TypeError) as e:
-                logger.warning(f"Skipping invalid soil sample at row {idx}: {str(e)}")
+            except (ValueError, TypeError, AttributeError) as e:
+                # Note: row index tracking not available with itertuples
+                logger.warning(f"Skipping invalid soil sample: {str(e)}")
                 continue
 
         logger.info(

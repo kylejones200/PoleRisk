@@ -15,10 +15,13 @@ jinja2>=3.0.0  # For HTML dashboard templates
 
 # Enhanced visualization
 signalplot>=0.1.2  # Minimalist plotting defaults for Matplotlib
-folium>=0.12.0  # For interactive maps
+# folium>=0.12.0  # Optional: For interactive maps (install separately if needed)
 
 # Time series to network analysis
 ts2net>=0.7.0  # Time series to network conversion for pattern analysis
+
+# Anomaly detection
+anomaly-detection-toolkit>=1.0.0  # Comprehensive anomaly detection methods
 
 # Web interface dependencies
 flask>=2.0.0
