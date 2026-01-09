@@ -1,4 +1,0 @@
-pole_id,latitude,longitude,pole_type,age_years,health_score,maintenance_priority,maintenance_window,recommended_action_date,days_until_action,recommended_actions,estimated_cost,confidence_level,requires_immediate_attention,soil_stability_score,structural_risk_score
-P002,40.758,-73.9855,concrete,20.11498973305955,98.42236842105262,low,routine,2026-10-03 21:00:11.789006,365,Routine visual inspection,243.75,0.7999999999999999,False,100,0
-P003,40.6782,-73.9442,steel,10.568104038329912,99.13157894736841,low,routine,2026-10-03 21:00:11.789006,365,Routine visual inspection,309.38,0.7999999999999999,False,100,0
-P001,40.7128,-74.006,wood,15.38672142368241,99.33684210526316,low,routine,2026-10-03 21:00:11.789006,365,Routine visual inspection,168.75,0.7999999999999999,False,100,0

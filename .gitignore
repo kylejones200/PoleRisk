@@ -142,5 +142,20 @@ Thumbs.db
 # Internal documentation
 .internal/
 
+# Output directories (generated files - keep sample data)
+Output/
+Analysis/
+uploads/
+
+# Input data (large NetCDF files - keep sample CSVs)
+Input/LPRM_NetCDF/
+Input/*.nc
+Input/*.nc4
+Input/In-situ data/
+
+# Generated/processed files
+performance_comparison.png
+*.log
+processing.log
 
 roadmap.md
