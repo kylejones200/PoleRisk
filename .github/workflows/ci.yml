@@ -16,7 +16,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # Test on Linux (primary deployment target) and macOS (common dev environment)
+        # Windows excluded - users can test locally if needed, saves CI time
+        os: [ubuntu-latest, macos-latest]
         python-version: ['3.12', '3.13']
     
     steps:
