@@ -6,7 +6,7 @@ that benefit from CPU acceleration but don't require the complexity of Rust exte
 
 Key acceleration areas:
 1. Geospatial grid search and interpolation
-2. Large array statistical operations  
+2. Large array statistical operations
 3. Time series processing loops
 4. Feature engineering computations
 """

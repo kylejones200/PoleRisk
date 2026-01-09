@@ -1,7 +1,7 @@
 """
 Performance acceleration module for pole health assessment platform.
 
-This module provides high-performance implementations of computationally intensive 
+This module provides high-performance implementations of computationally intensive
 operations using Numba JIT compilation. Key acceleration areas:
 
 1. **Geospatial Operations** (10-50x speedup)
@@ -9,7 +9,7 @@ operations using Numba JIT compilation. Key acceleration areas:
    - Grid coordinate matching and interpolation
    - Distance calculations over large coordinate grids
 
-2. **Statistical Analysis** (2-5x speedup)  
+2. **Statistical Analysis** (2-5x speedup)
    - Batch statistical computations across multiple locations
    - Fallback implementations when Rust extensions unavailable
    - Time series analysis and missing value interpolation
@@ -23,7 +23,7 @@ operations using Numba JIT compilation. Key acceleration areas:
 
 The platform uses a **three-tier acceleration approach**:
 
-1. **Rust Extensions** (5-15x) - For core statistical functions  
+1. **Rust Extensions** (5-15x) - For core statistical functions
 2. **Numba JIT** (2-50x) - For geospatial and array operations
 3. **Pure Python** (1x) - Fallback with graceful degradation
 
@@ -37,18 +37,18 @@ from polerisk.acceleration import find_nearest_valid_pixel_numba
 found, time_series = find_nearest_valid_pixel_numba(
     satellite_data,  # Shape: (time, lat, lon)
     target_row=50,
-    target_col=100, 
+    target_col=100,
     search_radius=5
 )
 ```
 
 ### Batch Statistical Analysis
-```python  
+```python
 from polerisk.acceleration import batch_statistical_analysis_numba
 
 # Analyze multiple locations in parallel
 rmse, corr, mae, bias = batch_statistical_analysis_numba(
-    location_data,    # Shape: (n_locations, n_timesteps) 
+    location_data,    # Shape: (n_locations, n_timesteps)
     reference_series  # Shape: (n_timesteps,)
 )
 ```
@@ -72,7 +72,7 @@ lat_idx, lon_idx, distance = find_nearest_grid_point_numba(
 # Core functionality (always available)
 pip install numpy
 
-# Numba acceleration (recommended)  
+# Numba acceleration (recommended)
 pip install numba
 
 # Maximum performance (all accelerations)
@@ -87,7 +87,7 @@ Typical speedups on representative workloads:
 | Operation | Pure Python | Numba | Rust | Best Choice |
 |-----------|------------|-------|------|-------------|
 | Statistical functions | 1x | 2-5x | 5-15x | **Rust** |
-| Pixel search (3D arrays) | 1x | 10-50x | N/A | **Numba** |  
+| Pixel search (3D arrays) | 1x | 10-50x | N/A | **Numba** |
 | Grid coordinate matching | 1x | 3-10x | N/A | **Numba** |
 | Batch analysis | 1x | 5-20x | N/A | **Numba** |
 

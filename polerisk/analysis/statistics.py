@@ -10,15 +10,15 @@ Examples
 --------
 >>> import numpy as np
 >>> from polerisk.analysis import calculate_rmse, calculate_correlation
->>> 
+>>>
 >>> # Generate sample data
 >>> x = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
 >>> y = np.array([1.1, 2.1, 2.9, 4.1, 5.0])
->>> 
+>>>
 >>> # Calculate RMSE
 >>> rmse = calculate_rmse(x, y)
 logger.debug(f"RMSE: {rmse:.4f}")
->>> 
+>>>
 >>> # Calculate correlation
 >>> corr = calculate_correlation(x, y)
 logger.debug(f"Correlation: {corr:.4f}")
