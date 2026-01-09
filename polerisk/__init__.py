@@ -7,7 +7,7 @@ and optimizing maintenance schedules. Includes soil moisture analysis, risk scor
 failure mode modeling, and economic lifecycle accounting.
 """
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "Kyle T. Jones"
 __email__ = "kyletjones@gmail.com"
 

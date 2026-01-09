@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "polerisk"
-version = "1.1.0"
+version = "1.1.1"
 description = "Predictive utility pole failure analysis and maintenance optimization platform"
 readme = "README.md"
 authors = [

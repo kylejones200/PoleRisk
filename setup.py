@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="polerisk",
-    version="1.1.0",
+    version="1.1.1",
     author="Kyle T. Jones",
     author_email="kyletjones@gmail.com",
     description="Predictive utility pole failure analysis and maintenance optimization platform",
