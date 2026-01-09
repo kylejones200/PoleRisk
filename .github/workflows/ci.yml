@@ -61,7 +61,7 @@ jobs:
     
     - name: Build Rust extensions
       run: |
-        cd soilmoisture_rs
+        cd polerisk_rs
         pip install maturin
         maturin develop --release
       continue-on-error: true  # Don't fail if Rust extensions can't be built
